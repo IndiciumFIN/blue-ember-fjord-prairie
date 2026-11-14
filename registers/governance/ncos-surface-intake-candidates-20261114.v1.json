@@ -47,14 +47,15 @@
     {
       "file": "bolsas.tsx",
       "sourcePath": "src/routes/bolsas.tsx",
-      "gitBlobSha1": "7bd67f8cb787cc31094468c58aabd6c71f61f9dd",
+      "gitBlobSha1": "be0a4f98251d9ee469973d34e52aa28b43a842ed",
       "reviewClass": "CE_CAREER_PLACEHOLDER",
       "gate": "HOLD_SOURCE",
       "admitted": false,
       "independentReview": "NOT_PERFORMED",
       "runtimeAccess": "NOT_TESTED",
       "kernelAdmission": "NOT_VERIFIED",
-      "sourceProvenance": "GITHUB_BLOB_ONLY"
+      "sourceProvenance": "GITHUB_BLOB_ONLY",
+      "reviewNote": "Observed placeholder only; robots noindex,nofollow in current source. This does not prevent direct access or grant admission."
     },
     {
       "file": "calculadoras-trabalhistas.tsx",
@@ -83,14 +84,15 @@
     {
       "file": "concursos.tsx",
       "sourcePath": "src/routes/concursos.tsx",
-      "gitBlobSha1": "d5a9f087042b8d53977fb794b30ab6149dbf114",
+      "gitBlobSha1": "5a8288d81492b8299b095e0196c302c33c7baca2",
       "reviewClass": "CE_CAREER_PLACEHOLDER",
       "gate": "HOLD_SOURCE",
       "admitted": false,
       "independentReview": "NOT_PERFORMED",
       "runtimeAccess": "NOT_TESTED",
       "kernelAdmission": "NOT_VERIFIED",
-      "sourceProvenance": "GITHUB_BLOB_ONLY"
+      "sourceProvenance": "GITHUB_BLOB_ONLY",
+      "reviewNote": "Observed placeholder only; robots noindex,nofollow in current source. This does not prevent direct access or grant admission."
     },
     {
       "file": "curiosidades.tsx",
@@ -107,14 +109,15 @@
     {
       "file": "cursos-sus.tsx",
       "sourcePath": "src/routes/cursos-sus.tsx",
-      "gitBlobSha1": "57a4c0f93f79604bd265ea9a7f722ba46cc15340",
+      "gitBlobSha1": "17de8ffc33c8808307b191fc144f6bbdb3187332",
       "reviewClass": "CE_EDUCATION_PLACEHOLDER",
       "gate": "HOLD_SOURCE",
       "admitted": false,
       "independentReview": "NOT_PERFORMED",
       "runtimeAccess": "NOT_TESTED",
       "kernelAdmission": "NOT_VERIFIED",
-      "sourceProvenance": "GITHUB_BLOB_ONLY"
+      "sourceProvenance": "GITHUB_BLOB_ONLY",
+      "reviewNote": "Observed placeholder only; robots noindex,nofollow in current source. This does not prevent direct access or grant admission."
     },
     {
       "file": "doencas-compulsorias.tsx",
@@ -203,26 +206,28 @@
     {
       "file": "oportunidades.tsx",
       "sourcePath": "src/routes/oportunidades.tsx",
-      "gitBlobSha1": "5bf8ff881834fd6e4b690686a4a54a46f6ad3a27",
+      "gitBlobSha1": "67696ee5083b6db244618145d69b1eea18626495",
       "reviewClass": "CE_CAREER_PLACEHOLDER",
       "gate": "HOLD_SOURCE",
       "admitted": false,
       "independentReview": "NOT_PERFORMED",
       "runtimeAccess": "NOT_TESTED",
       "kernelAdmission": "NOT_VERIFIED",
-      "sourceProvenance": "GITHUB_BLOB_ONLY"
+      "sourceProvenance": "GITHUB_BLOB_ONLY",
+      "reviewNote": "Observed placeholder only; robots noindex,nofollow in current source. This does not prevent direct access or grant admission."
     },
     {
       "file": "residencias.tsx",
       "sourcePath": "src/routes/residencias.tsx",
-      "gitBlobSha1": "93ead56b74ac91a37182e3b7a6a9a05302978f52",
+      "gitBlobSha1": "58804831ae11f65977056cee73c2e7be06b8938b",
       "reviewClass": "CE_CAREER_PLACEHOLDER",
       "gate": "HOLD_SOURCE",
       "admitted": false,
       "independentReview": "NOT_PERFORMED",
       "runtimeAccess": "NOT_TESTED",
       "kernelAdmission": "NOT_VERIFIED",
-      "sourceProvenance": "GITHUB_BLOB_ONLY"
+      "sourceProvenance": "GITHUB_BLOB_ONLY",
+      "reviewNote": "Observed placeholder only; robots noindex,nofollow in current source. This does not prevent direct access or grant admission."
     },
     {
       "file": "sbar.tsx",
@@ -239,14 +244,15 @@
     {
       "file": "vagas.tsx",
       "sourcePath": "src/routes/vagas.tsx",
-      "gitBlobSha1": "bafbba92377e0b277b7ecb18fbd455dbd601ff40",
+      "gitBlobSha1": "547e3123af8c0b5c8af67320f6b0a59ce7a42b56",
       "reviewClass": "CE_CAREER_PLACEHOLDER",
       "gate": "HOLD_SOURCE",
       "admitted": false,
       "independentReview": "NOT_PERFORMED",
       "runtimeAccess": "NOT_TESTED",
       "kernelAdmission": "NOT_VERIFIED",
-      "sourceProvenance": "GITHUB_BLOB_ONLY"
+      "sourceProvenance": "GITHUB_BLOB_ONLY",
+      "reviewNote": "Observed placeholder only; robots noindex,nofollow in current source. This does not prevent direct access or grant admission."
     }
   ]
 }
