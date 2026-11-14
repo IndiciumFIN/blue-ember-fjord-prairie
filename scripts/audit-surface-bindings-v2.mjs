@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
+import { auditCandidateRouteIntake } from './lib/ncos-surface-intake-audit.mjs';
 const root=resolve(import.meta.dirname,'..');
 const reg=JSON.parse(readFileSync(resolve(root,'registers/canonical/surface-contracts.v2.json'),'utf8'));
 const routeReg=JSON.parse(readFileSync(resolve(root,'registers/canonical/route-contracts.v1.json'),'utf8'));
@@ -10,7 +11,14 @@ function filesAt(dir, prefix='') {
 }
 const actual=filesAt(directory).sort(); const expected=Object.keys(reg.entries).sort();
 const findings=[]; const records=[];
-for(const x of actual) if(!reg.entries[x]) findings.push({id:'UNKNOWN_ROUTE',route:x});
+// Observations do not grant route authority: unregistered candidates and
+// out-of-scope paths remain blocking even when pinned to known Git blobs.
+const intake=JSON.parse(readFileSync(resolve(root,'registers/governance/ncos-surface-intake-candidates-20261114.v1.json'),'utf8'));
+const candidateAudit=auditCandidateRouteIntake({
+ actual,contracted:expected,intake,
+ readRoute:file=>readFileSync(resolve(directory,file)),
+});
+findings.push(...candidateAudit.findings);
 for(const x of expected) if(!actual.includes(x)) findings.push({id:'MISSING_ROUTE',route:x});
 for(const file of expected.filter(x=>actual.includes(x))){
  const spec=reg.entries[file], body=readFileSync(resolve(directory,file),'utf8');
@@ -24,7 +32,7 @@ for(const file of expected.filter(x=>actual.includes(x))){
  if(spec.role==='administrator-local'&&/@\/lib\/(db|admin-data)/.test(body))findings.push({id:'ADMIN_REMOTE_ACCESS',route:file});
  records.push({file,kind:spec.kind,role:spec.role,templateKind:spec.templateKind,sourceSha256:createHash('sha256').update(body).digest('hex'),requiredImports:spec.requiredImports,missingImports:missing,status:missing.length?'FAIL':'STATIC_PASS'});
 }
-const report={schemaVersion:'2.0.0',scope:reg.scope,generatedAt:new Date().toISOString(),status:findings.length?'FAIL':'STATIC_PASS_NOT_VISUAL',summary:{total:actual.length,withExplicitContracts:records.length,findings:findings.length,visualHomologations:0},records,findings};
+const report={schemaVersion:'2.0.0',scope:reg.scope,generatedAt:new Date().toISOString(),status:findings.length?'FAIL':'STATIC_PASS_NOT_VISUAL',summary:{total:actual.length,withExplicitContracts:records.length,findings:findings.length,visualHomologations:0,candidateIntake:candidateAudit.summary},records,findings};
 writeFileSync(resolve(root,'registers/canonical/surface-binding-register.v2.json'),JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report.summary));
 if(findings.length){console.error(JSON.stringify(findings,null,2));process.exitCode=1;}
