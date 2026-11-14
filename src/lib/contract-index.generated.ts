@@ -274,6 +274,10 @@ export const contractComponents = [
     "file": "src/components/site/home-page.tsx"
   },
   {
+    "id": "CE-COMP-member-identity",
+    "file": "src/components/site/member-identity.tsx"
+  },
+  {
     "id": "CE-COMP-not-found",
     "file": "src/components/site/not-found.tsx"
   },
@@ -1078,6 +1082,10 @@ export const contractToolComponents = [
   {
     "id": "CE-COMP-home-page",
     "component_key": "home-page"
+  },
+  {
+    "id": "CE-COMP-member-identity",
+    "component_key": "member-identity"
   },
   {
     "id": "CE-COMP-not-found",
