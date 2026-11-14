@@ -1,0 +1,50 @@
+name: Screenshot atlas - canonical templates (no deploy)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "scripts/capture-all-templates.mjs"
+      - ".github/workflows/captura-templates-no-deploy.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VITE_AUTH_ENABLED: "false"
+      DATABASE_URL: ""
+      PGHOST: ""
+      CI: "true"
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Capture entire template catalog on localhost
+        run: |
+          npm run dev > /tmp/template-atlas-vite.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 50); do
+            if ! kill -0 "$server_pid" 2>/dev/null; then cat /tmp/template-atlas-vite.log; exit 1; fi
+            if curl -fsS http://127.0.0.1:8080/ -o /dev/null 2>/dev/null; then break; fi
+            sleep 2
+          done
+          curl --fail http://127.0.0.1:8080/ -o /dev/null || { cat /tmp/template-atlas-vite.log; exit 1; }
+          node --experimental-strip-types --import ./scripts/alias-hook.mjs scripts/capture-all-templates.mjs
+      - name: Attach screenshots, index and errors
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: all-canonical-templates-screenshots
+          path: audit/visual/template-atlas/
+          if-no-files-found: warn
+          retention-days: 14
