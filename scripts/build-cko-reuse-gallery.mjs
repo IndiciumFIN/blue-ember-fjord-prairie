@@ -23,6 +23,9 @@ const officialCss=await readFile(join(root,'contracts/cko-tokens/dist/cko-univer
 if(registry.templates.length!==8 || components.components.length!==27 || overlays.overlays.length!==20)
   throw new Error('Core registry counts changed');
 await P(join(out,'assets','cko-universal-content-tokens.css'),officialCss);
+const responsiveAdapter='@media(max-width:770px){.cko-wrap{min-width:0}.cko-panel{min-width:0;overflow-wrap:anywhere}.cko-table{width:100%;table-layout:fixed}.cko-table th,.cko-table td{white-space:normal!important;overflow-wrap:anywhere}.status{max-width:100%;white-space:normal;overflow-wrap:anywhere}}';
+await P(join(out,'assets','cko-responsive-layout-adapter.css'),responsiveAdapter);
+
 const manifest={
  schemaVersion:1,mode:'REVIEW_ONLY',source:'IndiciumFIN/blue-ember-fjord-prairie',
  sourceCommit:process.env.GITHUB_SHA || null,generatedAt:new Date().toISOString(),
@@ -35,6 +38,7 @@ const manifest={
  clinicalReleased:false,published:false,serverFunctionalityInSnapshots:false,
  profiles:[],siteExamples:[],issues:[]
 };
+manifest.layoutAdapter={path:'assets/cko-responsive-layout-adapter.css',sha256:hash(responsiveAdapter),status:'PREVIEW_ONLY_SHARED_RESPONSIVE_ADAPTER',changesToOriginalSource:false};
 const browser=await chromium.launch({headless:true});
 const ctx=await browser.newContext({serviceWorkers:'block',reducedMotion:'reduce'});
 const d={id:'desktop',width:1440,height:900},m={id:'mobile',width:390,height:844};
@@ -66,7 +70,7 @@ for(const reg of registry.templates){
  cssFingerprints.add(hash(styles[0][1]));
  if(cssFingerprints.size>1)throw new Error('Divergent CSS found in CKO skeletons');
  if(manifest.profiles.length===0)await P(join(out,'assets','cko-original-shared.css'),styles[0][1]);
- const converted=html.replace(styles[0][0],'<link rel="stylesheet" href="../assets/cko-universal-content-tokens.css"><link rel="stylesheet" href="../assets/cko-original-shared.css">')
+ const converted=html.replace(styles[0][0],'<link rel="stylesheet" href="../assets/cko-universal-content-tokens.css"><link rel="stylesheet" href="../assets/cko-original-shared.css"><link rel="stylesheet" href="../assets/cko-responsive-layout-adapter.css">')
  .replace(/<\/head>/i,'<meta name="cko-contract-version" content="'+escape(reg.version)+'"><meta name="cko-source-html" content="'+escape(original)+'"></head>');
  const htmlPath='perfis/'+reg.template_id+'.html';
  await P(join(out,htmlPath),converted);
