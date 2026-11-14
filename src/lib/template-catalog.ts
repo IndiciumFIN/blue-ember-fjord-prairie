@@ -48,6 +48,7 @@ export const templateCatalog: CatalogRow[] = [
   { id: "area-assinante", name: "Área do assinante", href: "/assinante", kind: "area", frame: "area", note: "none", situacao: "montagem", source: "área logada" },
   { id: "area-admin", name: "Área do administrador", href: "/admin", kind: "area", frame: "admin", note: "none", situacao: "montagem", source: "console" },
   { id: "viladocuidado", name: "Vila do Cuidado", href: "/viladocuidado", kind: "editorial", frame: "shell", note: "inline", situacao: "montagem", source: "piloto educativo migrado do backup" },
+  { id: "inventario-ferramentas", name: "Inventário de ferramentas", href: "/modelos/inventario-ferramentas", kind: "editorial", frame: "shell", note: "callout", situacao: "montagem", source: "diagnóstico histórico, sem publicar cálculos" },
   ...canonicalContentFamilies.map((family) => ({
     id: family.id, name: family.name, href: `/modelos/${family.id}`,
     kind: family.kind, frame: "shell" as const, note: "callout" as const,
