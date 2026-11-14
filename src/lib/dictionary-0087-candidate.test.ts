@@ -10,9 +10,17 @@ type DictEntity = { name: string; layer_id: string; purpose: string; primary_key
 async function rootPGlite() {
   const db = new PGlite();
   const base = new URL("../../migrations/", import.meta.url);
-  const names = (await readdir(base)).filter(n => /^\d{4}_.+\.sql$/.test(n)).sort();
-  assert.equal(names.length, 85, "the root migration corpus changed; re-review 0087 before remote admission");
+  const available = (await readdir(base)).filter(n => /^\d{4}_.+\.sql$/.test(n)).sort();
+  const names = available.filter(n => n !== "0087_dicionario_candidato.sql");
+  assert.equal(names.length, 85, "the historic migration corpus changed; re-review 0087");
   assert.equal(names.at(-1), "0085_carreira_fundamento.sql");
+  assert.ok(available.length === 85 || (available.length === 86 && available.includes("0087_dicionario_candidato.sql")),
+    "unexpected root SQL migration or duplicate metadata migration");
+  const source = await readFile(new URL("../../migrations/candidates/0087_dicionario_candidato.sql", import.meta.url), "utf8");
+  if (available.includes("0087_dicionario_candidato.sql")) {
+    const promoted = await readFile(new URL("0087_dicionario_candidato.sql", base), "utf8");
+    assert.equal(promoted, source, "root 0087 differs from preserved original SQL bytes");
+  }
   for (const name of names) await db.exec(await readFile(new URL(name, base), "utf8"));
   return db;
 }
