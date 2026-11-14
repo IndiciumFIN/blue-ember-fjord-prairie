@@ -42,7 +42,8 @@ const browser = await chromium.launch({headless:true});
 const context = await browser.newContext({serviceWorkers:"block", reducedMotion:"reduce"});
 async function capture(job) {
   const {item,viewport,index}=job;
-  const page=await context.newPage({viewport:{width:viewport.width,height:viewport.height},deviceScaleFactor:1});
+  const page=await context.newPage();
+  await page.setViewportSize({width:viewport.width,height:viewport.height});
   const safeId=item.id.replace(/[^-a-z0-9]/gi,"_");
   const name=`${String(index).padStart(2,"0")}-${safeId}-${viewport.id}.png`;
   const errors=[];
@@ -67,8 +68,13 @@ async function capture(job) {
       title:document.title, length:(document.body?.innerText || "").trim().length,
       heading:!!document.querySelector("h1")?.textContent?.trim(),
       overflow:document.documentElement.scrollWidth>window.innerWidth+3,
+      actualViewport:{width:window.innerWidth,height:window.innerHeight},
     }));
     entry.pageTitle=details.title;
+    entry.actualViewport=details.actualViewport;
+    if (details.actualViewport.width !== viewport.width || details.actualViewport.height !== viewport.height) {
+      errors.push("VIEWPORT_MISMATCH");
+    }
     entry.textLength=details.length;
     entry.hasHeading=details.heading;
     if(details.overflow) errors.push("HORIZONTAL_OVERFLOW");
