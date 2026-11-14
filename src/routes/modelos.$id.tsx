@@ -14,6 +14,9 @@ import { readEditorial } from "@/lib/stored.functions";
 import { unflatten, useStored } from "@/lib/stored";
 import { lorem, loremData } from "@/lib/lorem";
 import { ContractView } from "@/components/templates/contract-view";
+import { CanonicalContentFamilyView } from "@/components/templates/canonical-content-family-view";
+import { ClinicalToolBacklogView } from "@/components/templates/clinical-tool-backlog-view";
+import { canonicalFamilyById } from "@/lib/canonical-content-families";
 import { recoveredTemplate } from "@/components/templates/recovered-templates";
 import { catalogById } from "@/lib/template-catalog";
 import { parseLocale } from "@/lib/translate";
@@ -28,6 +31,7 @@ export const Route = createFileRoute("/modelos/$id")({
   },
   loader: async ({ params }) => {
     if (params.id === "folha") throw redirect({ to: "/ferramentas/$slug", params: { slug: "gotejamento" } });
+    if (params.id === "inventario-ferramentas") return { kind: "inventario" as const };
     if (params.id === "guia") return { kind: "guia" as const };
     if (params.id === "biblioteca") return { kind: "biblioteca" as const };
     if (params.id === "norma") return { kind: "norma" as const };
@@ -53,6 +57,7 @@ export const Route = createFileRoute("/modelos/$id")({
 function Modelo() {
   const data = Route.useLoaderData();
   const templates = useStored().templates;
+  if (data.kind === "inventario") return <Shell><ClinicalToolBacklogView /></Shell>;
   if (data.kind === "guia") return <Shell><GuideView /></Shell>;
   if (data.kind === "biblioteca") return <Shell><LibraryView /></Shell>;
   if (data.kind === "norma") return <Shell><NormView /></Shell>;
@@ -61,6 +66,8 @@ function Modelo() {
   if (data.kind === "institucional") return <Shell><InstitutionalTemplate /></Shell>;
   if (data.kind === "slides") return <Shell><SlideDeck /></Shell>;
   if (data.kind === "contrato") {
+    const family = canonicalFamilyById(data.row.id);
+    if (family) return <Shell><CanonicalContentFamilyView family={family} /></Shell>;
     const Recovered = recoveredTemplate(data.row.id);
     return <Shell>{Recovered ? <Recovered /> : <ContractView row={data.row} />}</Shell>;
   }

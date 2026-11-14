@@ -39,6 +39,10 @@
       "file": "src/components/site/home-page.tsx"
     },
     {
+      "id": "CE-COMP-member-identity",
+      "file": "src/components/site/member-identity.tsx"
+    },
+    {
       "id": "CE-COMP-not-found",
       "file": "src/components/site/not-found.tsx"
     },

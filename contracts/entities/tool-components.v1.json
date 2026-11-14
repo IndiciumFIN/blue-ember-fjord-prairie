@@ -72,6 +72,14 @@
       "status": "DRAFT"
     },
     {
+      "id": "CE-COMP-member-identity",
+      "component_key": "member-identity",
+      "owner_module": "src/components/site/member-identity.tsx",
+      "semantic_role": "member-identity",
+      "reusability_scope": "SITE",
+      "status": "DRAFT"
+    },
+    {
       "id": "CE-COMP-not-found",
       "component_key": "not-found",
       "owner_module": "src/components/site/not-found.tsx",
