@@ -40,7 +40,8 @@ const ctx=await browser.newContext({serviceWorkers:'block',reducedMotion:'reduce
 const d={id:'desktop',width:1440,height:900},m={id:'mobile',width:390,height:844};
 async function shot(targetPath,dest,vp){
  await mkdir(dirname(dest),{recursive:true});
- const page=await ctx.newPage({viewport:{width:vp.width,height:vp.height},deviceScaleFactor:1});
+ const page=await ctx.newPage();
+ await page.setViewportSize({width:vp.width,height:vp.height});
  try{
   const errs=[];page.on('pageerror',er=>errs.push(String(er)));
   const response=await page.goto(pathToFileURL(targetPath).href,{waitUntil:'load',timeout:25000});
@@ -97,7 +98,8 @@ async function keepStyle(css){
 const id=x=>String(x).replace(/[^a-zA-Z0-9_-]/g,'_');
 const routes=new Map(templateCatalog.map(x=>[x.href,id(x.id)+'.html']));
 for(const x of templateCatalog){
- const page=await ctx.newPage({viewport:{width:d.width,height:d.height},deviceScaleFactor:1});
+ const page=await ctx.newPage();
+ await page.setViewportSize({width:d.width,height:d.height});
  const issues=[];page.on('pageerror',er=>issues.push('BROWSER: '+String(er).slice(0,350)));
  let html='',code=null,title='';
  try{
@@ -165,7 +167,10 @@ const lines=[['tipo','id','nome','origem','html','print','estado','avisos'],...m
 const csv=lines.map(line=>line.map(value=>'"'+String(value).replaceAll('"','""')+'"').join(',')).join('\n')+'\n';
 await P(join(out,'indice.csv'),csv);
 await P(join(out,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
+const allShotIssues=[...manifest.profiles,...manifest.siteExamples].flatMap(obj=>obj.screenshots.map(s=>({id:obj.id,viewport:s.viewport,errors:s.errors}))).filter(x=>x.errors.length);
+manifest.visualWarnings=allShotIssues;
+await P(join(out,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
 const summary={profiles:manifest.profiles.length,profileHtml:manifest.profiles.filter(x=>x.htmlSha256).length,profilePng:manifest.profiles.reduce((n,x)=>n+x.screenshots.length,0),siteRows:manifest.siteExamples.length,siteHtml:manifest.siteExamples.filter(x=>x.htmlSha256).length,sitePng:manifest.siteExamples.reduce((n,x)=>n+x.screenshots.length,0),sharedOriginalStyles:cssFingerprints.size,issues:manifest.issues.length};
 console.log('CKO_REVIEW_RESULT '+JSON.stringify(summary));
 await ctx.close();await browser.close();
-if(summary.profileHtml!==8 || summary.profilePng!==16 || summary.siteHtml!==41 || summary.sitePng!==41)process.exitCode=1;
+if(summary.profileHtml!==8 || summary.profilePng!==16 || summary.siteHtml!==41 || summary.sitePng!==41 || allShotIssues.some(x=>x.errors.includes('VIEWPORT_MISMATCH')))process.exitCode=1;
