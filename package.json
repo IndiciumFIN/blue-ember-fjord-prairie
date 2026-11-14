@@ -18,7 +18,7 @@
     "typecheck": "tsc --noEmit",
     "check:auth": "node scripts/check-auth-invariant.mjs",
     "test": "node --test 'scripts/**/*.test.mjs' && node --import ./scripts/register-test-alias.mjs --experimental-strip-types --test src/lib/app-data/app-data.test.ts src/lib/app-data/readiness-schedule.test.ts src/lib/auth/gate-identity.test.ts src/lib/auth/sign-in-gate.test.ts src/lib/preview-path-prefix.test.ts src/lib/desk-boundary.test.ts src/lib/ecosystem-audit.test.ts",
-    "test:platform": "node --import ./scripts/register-test-alias.mjs --experimental-strip-types --test --test-concurrency=2 src/lib/dictionary.test.ts src/lib/dictionary-sync.test.ts src/core/compliance/content-clinical-layer.test.ts src/core/compliance/process-layer-complete.test.ts src/core/compliance/metadata-model.test.ts src/core/compliance/platform-conclusion.test.ts",
+    "test:platform": "node --import ./scripts/register-test-alias.mjs --experimental-strip-types --test --test-concurrency=2 src/lib/dictionary.test.ts src/lib/dictionary-sync.test.ts src/core/compliance/content-clinical-layer.test.ts src/core/compliance/process-layer-complete.test.ts src/core/compliance/metadata-model.test.ts src/core/compliance/platform-conclusion.test.ts src/lib/fk-tuple-catalog.test.ts",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
