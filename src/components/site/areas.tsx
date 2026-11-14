@@ -49,9 +49,11 @@ export function AreaGuard({ allow, children }: { allow: "admin" | "member"; chil
 
 export function AreaFrame({
   role,
+  title,
   children,
 }: {
   role: "admin" | "assinante";
+  title?: string;
   children: ReactNode;
 }) {
   const gateSession = useSyncExternalStore(subscribe, hasGateSessionMarker, () => false);
@@ -60,12 +62,13 @@ export function AreaFrame({
     <div className="area-app">
       <header className="area-bar">
         <Link to={role === "admin" ? "/admin" : "/assinante"} className="area-brand">
-          {role === "admin" ? "Administração" : "Área do assinante"}
+          {title ?? (role === "admin" ? "Administração" : "Área do assinante")}
         </Link>
         <span className={`badge ${role === "admin" ? "badge-warn" : "badge-info"}`}>
           {role === "admin" ? "Controle da fonte" : "Consome a fonte publicada"}
         </span>
-        <nav className="area-links">
+        <nav className="area-links" aria-label="Navegação da área">
+          <Link to="/conta">Minha conta</Link>
           {role === "admin" ? <Link to="/assinante">Ver como assinante</Link> : <Link to="/assinante" hash="comunidade">Comunidade</Link>}
           <Link to="/">Site público</Link>
         </nav>
