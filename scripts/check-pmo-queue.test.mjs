@@ -30,13 +30,19 @@ test('R82: real rev18 queue allows only owner-evidenced local Commander work',()
 test('R82: historical PAUSED is allowed when event history agrees',()=>{
  const q=clone();
  assert.equal(q.items[0].status,'IN_PROGRESS');
- const event=q.events.at(-1);
- assert.equal(event.workId,'WO-ADM-001');
- q.events.pop();q.items[0].status='PAUSED';
+ const index=q.events.findLastIndex(event=>event.workId==='WO-ADM-001');
+ assert.notEqual(index,-1);
+ assert.equal(q.events[index].to,'IN_PROGRESS');
+ q.events.splice(index,1);
+ q.events.forEach((event,i)=>{event.seq=i+1;});
+ q.items.find(item=>item.id==='WO-ADM-001').status='PAUSED';
  const r=run(q);assert.equal(r.code,0,r.output);
 });
 test('R82: owner authority statement is required',()=>{
- const q=clone();q.events.at(-1).reason='This change is proposed in the repository without owner authority';
+ const q=clone();
+ const transition=q.events.findLast(event=>event.workId==='WO-ADM-001');
+ assert.ok(transition);
+ transition.reason='This change is proposed in the repository without owner authority';
  const r=run(q);assert.notEqual(r.code,0);assert.match(r.output,/Owner-approved local scope is missing/);
 });
 test('R82: local-only Commander cannot grow remote execution path',()=>{
