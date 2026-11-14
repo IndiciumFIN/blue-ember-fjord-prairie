@@ -132,7 +132,14 @@ for(const x of templateCatalog){
      try{
        const fetched=await fetch(new URL(href,url.origin));
        if(!fetched.ok){issues.push('CSS_HTTP_'+fetched.status+': '+href);continue}
-       const filename=await keepStyle(await fetched.text());
+       let cssText=await fetched.text();
+       // Vite serves imported CSS as a JS module in dev; recover the exact CSS payload.
+       if(cssText.includes('const __vite__css = ')){
+         const cssMatch=cssText.match(/const __vite__css = ("(?:\\.|[^"\\])*")\s*__vite__updateStyle/);
+         if(!cssMatch){issues.push('UNREADABLE_VITE_CSS_MODULE: '+href);continue}
+         cssText=JSON.parse(cssMatch[1]);
+       }
+       const filename=await keepStyle(cssText);
        html=html.replace(link[0],'<link rel="stylesheet" href="../assets/'+filename+'">');
      }catch(er){issues.push('CSS_MISSING: '+href)}
    }
