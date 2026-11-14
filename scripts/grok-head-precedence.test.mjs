@@ -51,6 +51,18 @@ test("a checagem e pelo TIPO da tag, nao pelo href — qualquer src conta", () =
   assert.ok(!out.includes("/__grok/icon-180.png"));
 });
 
+test("app-owned rel em aspas simples e maiusculas impede icon default", () => {
+  const out = injectGrokPwaHead(doc("<link sizes='180x180' rel='ICON APPLE-TOUCH-ICON' href='/marca.png'>"));
+  assert.ok(!out.includes("/__grok/icon-180.png"));
+  assert.ok(out.includes("href='/marca.png'"));
+});
+
+test("manifest alternativo com rel multiplo impede manifest default", () => {
+  const out = injectGrokPwaHead(doc("<link rel='alternate manifest' href='/marca.webmanifest'>"));
+  assert.ok(!out.includes("href=\"/__grok/manifest.webmanifest\""));
+  assert.ok(out.includes("href='/marca.webmanifest'"));
+});
+
 test("documento sem head nao lanca", () => {
   assert.doesNotThrow(() => injectGrokPwaHead("<html><body>sem head</body></html>"));
 });
