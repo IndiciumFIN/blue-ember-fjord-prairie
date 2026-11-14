@@ -1,10 +1,13 @@
+import { isoFichaRules } from "./iso-fichas.ts";
+
 export type FrameworkName =
   | "COSO"
   | "COBIT"
   | "ISO27001"
   | "ISO31000"
   | "NIST-CSF"
-  | "ITIL";
+  | "ITIL"
+  | "INTERNO";
 
 export type ComplianceSeverity = "warning" | "critical" | "blocker";
 
@@ -53,9 +56,9 @@ export const normativeCatalog: Record<string, NormativeRule> = {
   "iso27001-access-control": {
     id: "iso27001-access-control",
     framework: "ISO27001",
-    ruleCode: "ISO27001-A.5.1",
-    description: "Controle de acesso deve estar vinculado a role e policy.",
-    requiredEvidence: ["role-policy", "access-allowlist"],
+    ruleCode: "INTERNO-politica-27001",
+    description: "A obrigação interna de acesso aponta a política própria. Não é o controle 5.1 da norma e não certifica.",
+    requiredEvidence: ["internal-policy", "role"],
     validator: "access-control-validator",
     severity: "blocker",
     onFail: "reject",
@@ -90,4 +93,5 @@ export const normativeCatalog: Record<string, NormativeRule> = {
     severity: "critical",
     onFail: "reject",
   },
+  ...isoFichaRules,
 };

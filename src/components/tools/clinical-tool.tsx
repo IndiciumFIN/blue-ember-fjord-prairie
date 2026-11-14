@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { ReferenceList } from "@/components/article/pieces";
-import { ClinicalForm, type ClinicalPatient } from "@/components/tools/clinical-form";
+import { ClinicalForm, type ClinicalPatient, type ClinicalValues } from "@/components/tools/clinical-form";
 import { hasBlock } from "@/lib/component-contract";
 import { ClinicalSheet } from "@/components/tools/clinical-sheet";
 import { ToolEcosystem, ToolFeedback, ToolMeta, ToolTutorial, ToolViewBar, useToolView } from "@/components/tools/tool-desk";
@@ -8,7 +10,10 @@ import { Breadcrumb } from "@/components/site/breadcrumb";
 import { RelatedContent } from "@/components/site/related-content";
 import { PageHero } from "@/components/site/page-hero";
 import { PageTools } from "@/components/site/page-tools";
-import { evaluateFormula, evaluateScale, formatNumber, type ToolFailure, type ToolSuccess } from "@/lib/tools/engine";
+import { formatNumber, reductionNote, type ToolFailure, type ToolSuccess } from "@/lib/tools/engine";
+import { renderAdmittedResult } from "@/lib/tools/engine-guard";
+import { clinicalSchema } from "@/lib/tools/input-schema";
+import { runClinical } from "@/lib/tools/clinical-run";
 import { getTool, tools } from "@/lib/tools/catalog";
 import { disclaimer, type ClinicalTool } from "@/lib/tools/types";
 import { downloadDocx } from "@/lib/docx";
@@ -21,7 +26,9 @@ function resultText(result: ToolSuccess) {
   const base = result.outputs
     ? result.outputs.map((output) => output.text ?? `${output.label}: ${formatNumber(output.value, output.digits)} ${output.unit}`).join(" · ")
     : `${result.totalLabel}: ${result.total}`;
-  return result.band ? `${base} · ${result.band.label}` : base;
+  const note = reductionNote(result);
+  const withNote = note ? `${base} · ${note}` : base;
+  return result.band ? `${withNote} · ${result.band.label}` : withNote;
 }
 
 function today() {
@@ -37,20 +44,31 @@ function emptyPatient(tool: ClinicalTool): Patient {
   return { nome: "", idade: "", setor: "", data: today(), meta };
 }
 
+function initialRaw(tool: ClinicalTool) {
+  const initial: Record<string, string> = {};
+  for (const field of tool.selects ?? []) initial[field.id] = String(field.options[0]?.value ?? "");
+  return initial;
+}
+
 export function ClinicalToolPage({ tool, area = "public" }: { tool: ClinicalTool; area?: "public" | "assinante" }) {
   const { locale, t } = useChrome();
   const { view, change, compact } = useToolView();
   const canRenderForm = contractOf("ferramenta").resources.includes("formulario");
   const canRenderLaudo = contractOf("ferramenta").resources.includes("laudo");
-  const [patient, setPatient] = useState<Patient>(() => emptyPatient(tool));
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [raw, setRaw] = useState<Record<string, string>>(() => {
-    const initial: Record<string, string> = {};
-    for (const field of tool.selects ?? []) initial[field.id] = String(field.options[0]?.value ?? "");
-    return initial;
-  });
   const [result, setResult] = useState<ToolSuccess | ToolFailure | null>(null);
   const [notes, setNotes] = useState("");
+  const form = useForm<ClinicalValues>({
+    resolver: zodResolver(clinicalSchema(tool)),
+    defaultValues: {
+      kind: tool.kind,
+      patient: emptyPatient(tool),
+      answers: {},
+      raw: initialRaw(tool),
+    },
+  });
+  const patient = form.watch("patient");
+  const answers = form.watch("answers");
+  const raw = form.watch("raw");
 
   const filled = (tool.criteria ?? []).filter((criterion) => answers[criterion.id] !== undefined).length;
   const related = useMemo(
@@ -59,19 +77,21 @@ export function ClinicalToolPage({ tool, area = "public" }: { tool: ClinicalTool
   );
 
   function calculate() {
-    const next = tool.kind === "escala" ? evaluateScale(tool, answers) : evaluateFormula(tool, raw);
-    setResult(next);
-    if (!next.ok) {
-      const missingId = next.missing?.[0];
-      const fieldId = next.fieldErrors ? Object.keys(next.fieldErrors)[0] : undefined;
-      const target = missingId ? `criterio-${missingId}` : fieldId ? `campo-${fieldId}` : "resultado";
-      document.getElementById(target)?.focus();
-    } else {
+    void form.handleSubmit((values) => {
+      const next = runClinical(tool, values);
+      setResult(next);
       document.getElementById("resultado")?.focus();
-    }
+    }, (errors) => {
+      setResult(null);
+      const rawId = errors.raw && typeof errors.raw === "object" ? Object.keys(errors.raw)[0] : undefined;
+      const answerId = errors.answers && typeof errors.answers === "object" ? Object.keys(errors.answers)[0] : undefined;
+      const target = answerId ? `criterio-${answerId}` : rawId ? `campo-${rawId}` : errors.patient ? "campo-nome" : "resultado";
+      document.getElementById(target)?.focus();
+    })();
   }
 
   function saveDoc() {
+    const shown = result ? renderAdmittedResult(result) : null;
     downloadDocx(`${tool.slug}-laudo.docx`, [
       { text: "Calculadoras de Enfermagem", bold: true },
       { text: tool.title, bold: true },
@@ -86,23 +106,19 @@ export function ClinicalToolPage({ tool, area = "public" }: { tool: ClinicalTool
       ...(tool.metaFields ?? []).map((field) => ({
         text: `${field.label}: ${field.options.find((option) => option.value === patient.meta[field.id])?.label ?? "Não informado"}`,
       })),
-      { text: `Resultado: ${result?.ok ? resultText(result) : "Não calculado"}`, bold: true },
-      ...(result?.ok && result.band ? [{ text: `Faixa: ${result.band.label}. ${result.band.note}` }] : []),
-      ...(result?.ok && result.steps ? result.steps.map((step) => ({ text: step })) : []),
-      ...(result?.ok ? result.rows.map((row) => ({ text: `${row.label}: ${row.value} (máx. ${row.max})` })) : []),
-      ...(result?.ok && tool.kind === "escala" && result.band?.nanda.length ? [{ text: `NANDA, só no laudo: ${result.band.nanda.join("; ")}` }] : []),
+      { text: `Resultado: ${shown ? resultText(shown) : "Não calculado"}`, bold: true },
+      ...(shown?.band ? [{ text: `Faixa: ${shown.band.label}. ${shown.band.note}` }] : []),
+      ...(shown?.steps ? shown.steps.map((step) => ({ text: step })) : []),
+      ...(shown ? shown.rows.map((row) => ({ text: `${row.label}: ${row.value} (máx. ${row.max})` })) : []),
+      ...(shown && tool.kind === "escala" && shown.band?.nanda.length ? [{ text: `NANDA, só no laudo: ${shown.band.nanda.join("; ")}` }] : []),
       ...(notes.trim() ? [{ text: `Observações: ${notes.trim()}` }] : []),
       { text: disclaimer },
     ]);
   }
 
   function clearCalc() {
-    setAnswers({});
-    setRaw(() => {
-      const initial: Record<string, string> = {};
-      for (const field of tool.selects ?? []) initial[field.id] = String(field.options[0]?.value ?? "");
-      return initial;
-    });
+    form.setValue("answers", {});
+    form.setValue("raw", initialRaw(tool));
     setResult(null);
   }
 
@@ -164,17 +180,14 @@ export function ClinicalToolPage({ tool, area = "public" }: { tool: ClinicalTool
       {canRenderForm ? (
         <ClinicalForm
           tool={tool}
-        patient={patient}
-        onPatient={setPatient}
-        raw={raw}
-        onRaw={setRaw}
-        answers={answers}
-        onAnswer={setAnswers}
-        result={result}
-        filled={filled}
-        onCalculate={calculate}
-        onClearCalc={clearCalc}
-        onClearPatient={() => setPatient(emptyPatient(tool))}
+          control={form.control}
+          errors={form.formState.errors}
+          answers={answers}
+          result={result}
+          filled={filled}
+          onCalculate={calculate}
+          onClearCalc={clearCalc}
+          onClearPatient={() => form.setValue("patient", emptyPatient(tool))}
           compact={compact}
         />
       ) : null}

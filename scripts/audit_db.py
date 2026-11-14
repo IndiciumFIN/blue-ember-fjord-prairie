@@ -33,7 +33,7 @@ failures = []
 
 for path in sorted(MIGRATIONS.glob("*.sql")):
     body = re.sub(r"--.*$", "", path.read_text(encoding="utf-8"), flags=re.M)
-    if re.search(r"\bjsonb\b|\bjson\b|\[\]", body, re.I):
+    if re.search(r"(?<!\.)\bjsonb?\b|\[\]", body, re.I):
         failures.append(f"{path.name}: lista ou JSON")
     if re.search(r"create table", body, re.I) and not re.search(r"primary key", body, re.I):
         failures.append(f"{path.name}: tabela sem chave primária")

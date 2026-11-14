@@ -1,4 +1,5 @@
 import type { ClinicalTool } from "@/lib/tools/types";
+import { acceptedCatalogTool } from "@/lib/tools/catalog-list";
 import { examesLaboratoriais } from "@/lib/tools/exames-laboratoriais";
 
 const braden: ClinicalTool = {
@@ -294,5 +295,6 @@ export const tools: ClinicalTool[] = [braden, morse, apgar, gotejamento, imc];
 export const candidateTools: ClinicalTool[] = [aldrete, examesLaboratoriais];
 
 export function getTool(slug: string) {
-  return tools.find((tool) => tool.slug === slug) ?? candidateTools.find((tool) => tool.slug === slug);
+  const found = tools.find((tool) => tool.slug === slug) ?? candidateTools.find((tool) => tool.slug === slug);
+  return found ? acceptedCatalogTool(found) ?? undefined : undefined;
 }

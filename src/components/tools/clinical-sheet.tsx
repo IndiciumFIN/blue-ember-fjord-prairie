@@ -1,6 +1,7 @@
 import { ReferenceList } from "@/components/article/pieces";
 import { hasBlock, hasLaudo } from "@/lib/component-contract";
-import { formatNumber, type ToolFailure, type ToolSuccess } from "@/lib/tools/engine";
+import { formatNumber, reductionNote, type ToolFailure, type ToolSuccess } from "@/lib/tools/engine";
+import { renderAdmittedResult } from "@/lib/tools/engine-guard";
 import { disclaimer, type ClinicalTool } from "@/lib/tools/types";
 import type { ClinicalPatient } from "@/components/tools/clinical-form";
 
@@ -19,7 +20,8 @@ export function ClinicalSheet({
   notes: string;
   result: ToolSuccess | ToolFailure | null;
 }) {
-  const nanda = result?.ok && result.band ? result.band.nanda : [];
+  const shown = result ? renderAdmittedResult(result) : null;
+  const nanda = shown?.band?.nanda ?? [];
   return (
     <article className="calc-sheet print-sheet">
       <p className="sheet-badge">{tool.kind === "escala" ? "ESCALA CLÍNICA" : "CALCULADORA CLÍNICA"} · {tool.category}</p>
@@ -60,14 +62,15 @@ export function ClinicalSheet({
       </section>
       <section className="sheet-section">
         <h3><span>3</span>Resultado e memória</h3>
-        {result?.ok && result.outputs
-          ? result.outputs.map((output) => <p key={output.id}><b>{output.label}:</b> {formatNumber(output.value, output.digits)} {output.unit}</p>)
-          : <p><b>{result?.ok ? result.totalLabel : "Resultado"}:</b> {result?.ok ? `${result.total}${result.max !== undefined ? ` / ${result.max}` : ""}` : "Não calculado"}</p>}
-        {result?.ok && result.band ? <p><b>Interpretação:</b> {result.band.label}. {result.band.note}</p> : null}
-        {result?.ok ? (
+        {shown?.outputs
+          ? shown.outputs.map((output) => <p key={output.id}><b>{output.label}:</b> {formatNumber(output.value, output.digits)} {output.unit}</p>)
+          : <p><b>{shown ? shown.totalLabel : "Resultado"}:</b> {shown ? `${shown.total}${shown.max !== undefined ? ` / ${shown.max}` : ""}` : "Não calculado"}</p>}
+        {shown?.band ? <p><b>Interpretação:</b> {shown.band.label}. {shown.band.note}</p> : null}
+        {shown?.reduced ? <p>{reductionNote(shown)}</p> : null}
+        {shown ? (
           <table className="calc-table memory">
             <thead><tr><th>Item</th><th>Obtido</th><th>Máx</th></tr></thead>
-            <tbody>{result.rows.map((row) => <tr key={row.label}><td>{row.label}</td><td>{row.value}</td><td>{row.max}</td></tr>)}</tbody>
+            <tbody>{shown.rows.map((row) => <tr key={row.label}><td>{row.label}</td><td>{row.value}</td><td>{row.max}</td></tr>)}</tbody>
           </table>
         ) : null}
         {hasBlock(tool.kind, "nanda") ? (

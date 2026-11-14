@@ -1,0 +1,103 @@
+{
+  "schema_version": "0.1.0",
+  "status": "PARTIAL",
+  "canonical_locale": "pt-BR",
+  "locales": {
+    "pt-BR": {
+      "content": "canonical",
+      "articles": 1,
+      "tools": 7
+    },
+    "en": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "es": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "de": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "it": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "fr": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "hi": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "zh": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "ar": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "ja": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "ru": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "ko": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "tr": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "nl": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "pl": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "sv": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "id": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "vi": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    },
+    "uk": {
+      "content": "not_verified",
+      "articles": 0,
+      "tools": 0
+    }
+  },
+  "note": "Dicionário de interface pronto para 19 idiomas. Conteúdo clínico é pt-BR por decisão editorial. Tradução de conteúdo exige revisão clínica humana (HOLD_HUMAN)."
+}

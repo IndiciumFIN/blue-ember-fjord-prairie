@@ -93,6 +93,7 @@ export function NormsModule() {
           <p>Domínio: {current.domain}</p>
           <p>Prioridade: {current.priority}</p>
           <p><Status value={current.right} /></p>
+          <p>{current.supportId ? `Documento interno: ${current.supportId}. Rascunho. Não é a cláusula e não certifica.` : "Sem documento interno. Só o identificador."}</p>
           <p className="tool-help">O texto da cláusula não está nesta mesa. Aqui só existe o metadado.</p>
         </>
       ) : null}

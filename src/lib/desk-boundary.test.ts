@@ -21,9 +21,6 @@ test("o que está publicado nesta mesa tem corpo e cálculo só nas cinco ferram
   const empty = await db.query<{ n: number }>("select count(*)::int as n from content_text where status = 'publicado' and btrim(body) = ''");
   assert.equal(empty.rows[0].n, 0);
 
-  // Migration 0054 deliberately reverted bulk publication of translations.
-  // The only explicitly grandfathered exception is the home reading page
-  // in en, es and fr. Every other foreign-language publication is a breach.
   const foreign = await db.query<{ slug: string; locale: string; view: string }>(
     "select slug, locale, view from content_text where status = 'publicado' and locale <> 'pt-BR' order by slug, locale, view",
   );

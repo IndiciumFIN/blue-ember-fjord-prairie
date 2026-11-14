@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { normativeCatalog } from "./frameworks.ts";
+import { runRule } from "./run-rule.ts";
 import { validateRequiredEvidence } from "./validators.ts";
 
 const rule = normativeCatalog["cso-risk-ownership"];
@@ -38,4 +39,15 @@ test("policy-defined HOLD rather than an inferred PASS is preserved", () => {
   const result = validateRequiredEvidence(hold, { "risk-owner": "reviewer" });
   assert.equal(result.ok, false);
   assert.equal(result.outcome, "hold");
+});
+
+test("a regra interna de acesso não aceita o número antigo da norma como prova", () => {
+  const access = normativeCatalog["iso27001-access-control"];
+  assert.equal(access.ruleCode, "INTERNO-politica-27001");
+  const good = { "internal-policy": "politica-27001", role: "admin" };
+  assert.equal(runRule(access, good, {}).ok, true);
+  assert.equal(runRule(access, { ...good, "internal-policy": "ISO27001-A.5.1" }, {}).reason, "access-control:internal-policy");
+  assert.equal(runRule(access, { ...good, role: "subscriber" }, {}).reason, "access-control:role");
+  assert.equal(runRule(access, good, { VERCEL: "1", VITE_AUTH_ENABLED: "false" }).reason, "access-control:auth-disabled");
+  assert.equal(runRule(access, { "internal-policy": "politica-27001" }, {}).ok, false);
 });

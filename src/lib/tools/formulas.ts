@@ -16,7 +16,7 @@ export const formulas: Record<string, (values: Record<string, number>) => Comput
     if (minutes <= 0) return { error: "Informe um tempo maior que zero." };
     const mlh = values.volume / (minutes / 60);
     const gotas = (values.volume * values.fator) / minutes;
-    return { outputs: { mlh, gotas: Math.round(gotas) } };
+    return { outputs: { mlh, gotas } };
   },
   imc: (values) => {
     const metros = values.altura / 100;

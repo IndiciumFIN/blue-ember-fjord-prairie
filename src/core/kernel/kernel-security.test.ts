@@ -75,8 +75,19 @@ test("missing, inactive, duplicate or unknown normative evidence is a failure", 
     assert.equal(x.length, 1);
     assert.equal(x[0].outcome, "rejected");
   }
-  assert.equal(evaluateCompliance(bundle, { "risk-owner": "owner", "risk-register": "register" })[0].ok, true);
+  assert.equal(evaluateCompliance(bundle, { "risk-owner": "owner", "risk-register": "risco-auth" })[0].ok, true);
+  assert.equal(evaluateCompliance(bundle, { "risk-owner": "owner", "risk-register": "register" })[0].ok, false);
   assert.equal(evaluateCompliance(bundle, {})[0].ok, false);
+});
+
+test("o controle de acesso da politica-27001 recusa e o portão não aprova", () => {
+  const accessBundle = { ...bundle, id: "access", normativeIds: ["iso27001-access-control"] };
+  const good = { "internal-policy": "politica-27001", role: "admin" };
+  assert.equal(evaluateCompliance(accessBundle, good, {})[0].ok, true);
+  const failed = evaluateCompliance(accessBundle, { ...good, role: "subscriber" }, {});
+  assert.equal(failed[0].outcome, "rejected");
+  assert.equal(decide(gate, [forged], [], failed).outcome, "rejected");
+  assert.equal(decide(gate, [forged], [], failed).signature, "");
 });
 
 test("legacy gate status does not grant execution authority", () => {

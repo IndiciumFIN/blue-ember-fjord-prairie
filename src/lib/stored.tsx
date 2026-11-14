@@ -32,7 +32,7 @@ export type StoredPhase = { id: string; name: string; status: string | null; det
 export type StoredToken = { name: string; hex: string; role: string; rejected: boolean };
 
 export type StoredFamily = { id: string; name: string; text: string };
-export type StoredNorm = { id: string; name: string; domain: string; right: string; priority: string };
+export type StoredNorm = { id: string; name: string; domain: string; right: string; priority: string; supportId: string | null };
 export type StoredTemplate = { id: string; type: string; name: string; category: string; description: string };
 export type StoredModule = { type: string; title: string; lines: { path: string; text: string }[] };
 export type StoredSpecimen = { id: string; title: string; lead: string; source: string; modules: StoredModule[] };

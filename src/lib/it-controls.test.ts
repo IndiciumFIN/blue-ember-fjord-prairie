@@ -10,9 +10,13 @@ test("as migrations não guardam lista nem JSON", async () => {
   for (const name of names) {
     const sql = await readFile(new URL(`../../migrations/${name}`, import.meta.url), "utf8");
     const body = sql.replace(/--.*$/gm, "");
-    assert.equal(/\bjsonb\b|\bjson\b|\[\]/i.test(body), false, name);
+    assert.equal(/(?<!\.)\bjsonb?\b|\[\]/i.test(body), false, name);
     if (/create table/i.test(body)) assert.match(body, /primary key/i);
   }
+  const rule = /(?<!\.)\bjsonb?\b|\[\]/i;
+  assert.equal(rule.test("create table t (id text primary key, payload jsonb)"), true);
+  assert.equal(rule.test("create table t (id text primary key, tags text[])"), true);
+  assert.equal(rule.test("insert into repo_file (path) values ('a.assets.json')"), false);
 });
 
 test("aplicar as migrations duas vezes não duplica o processo", async () => {

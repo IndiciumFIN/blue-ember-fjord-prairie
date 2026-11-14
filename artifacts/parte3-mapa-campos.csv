@@ -1,0 +1,35 @@
+objeto,remoto,destino,escreve_agora,regra
+prova,exams.canonical_key,exam_intake.canonical_key,nao,identidade da prova
+prova,exams.id,exam_intake.remote_id,nao,rastro; nao e chave local
+prova,exams.organization,exam_intake.organization,nao,literal
+prova,exams.year,exam_intake.year,nao,literal
+prova,exams.exam_board,exam_intake.exam_board,nao,literal
+prova,exams.state_code,exam_intake.state_code,nao,literal
+prova,exams.nursing_level,exam_intake.nursing_level,nao,nao vira kind
+prova,exams.role_title,exam_intake.role_title,nao,separa cargo fino
+prova,exams.specialty,exam_intake.specialty,nao,separa as duas EBSERH
+prova,exams.exam_date,exam_intake.exam_date,nao,literal
+prova,exams.status,exam_intake.remote_status,nao,nao vira publicado
+prova,exam_questions.statement,exam_question_intake.prompt,nao,nao vai para study_item
+prova,exam_questions.question_number,exam_question_intake.position,nao,ordem na prova; nao e o indice da resposta
+prova,exam_questions.subject,exam_question_intake.subject,nao,nao se deduz do enunciado
+prova,exam_questions.topic,exam_question_intake.topic,nao,literal
+prova,exam_questions.subtopic,exam_question_intake.subtopic,nao,literal
+prova,exam_question_options.option_key,exam_option_intake.letter,nao,guardar original e upper
+prova,exam_question_options.option_text,exam_option_intake.label,nao,literal
+prova,exam_question_options.ordinal,exam_option_intake.position,nao,nao recontar do zero
+prova,exam_answer_keys.correct_option_key,exam_key_intake.correct_letter,nao,tem de existir na questao
+prova,exam_answer_keys.answer_key_type,exam_key_intake.key_type,nao,so OFFICIAL_DEFINITIVE no lote candidato
+prova,exam_answer_keys.status,exam_key_intake.remote_key_status,nao,VALIDATED no gabarito nao publica a prova
+ferramenta,md_tool_registry.tool_slug,source_tool.slug,nao,so compara
+ferramenta,md_tool_registry.route,caminho do instrumento,nao,nao preenche title nem lead
+ferramenta,md_tool_registry.identity_status,nenhum,nao,IDENTITY_RESOLVED e necessario e nao basta
+ferramenta,md_tool_registry.canonical_promotion_allowed,nenhum,nao,falso barra escrita nas 131
+ferramenta,md_tool_registry.field_count,contagem de tool_field,nao,conferencia; pac* fora da conta
+ferramenta,field_contract.field_name pac*,nenhum,nao,nao e tool_field e nao e cookie
+ferramenta,field_contract.min_value_text,tool_field.min_value,nao,so se for numero; 1152 vazios
+ferramenta,field_contract.max_value_text,tool_field.max_value,nao,so se for numero e min<=max
+ferramenta,field_contract.step_value_text,tool_field.step,nao,so se for numero
+ferramenta,field_contract.unit_system_ref,tool_field.unit,nao,UCUM nao e a unidade do campo
+capa,content_text.title,source_tool.title,ja_local,a capa continua na main
+capa,content_text.lead,source_tool.lead,ja_local,o remoto nao substitui

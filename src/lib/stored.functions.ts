@@ -96,7 +96,7 @@ export const readStoredSite = createServerFn({ method: "GET" }).handler(async ()
   const tokens = await sql<StoredToken>`select name, hex, role, rejected from color_token order by rejected, name`;
   const families = await sql<StoredFamily>`select id, name, text from template_family order by position`;
   const templates = await sql<StoredTemplate>`select id, type, name, category, description from editorial_template order by position`;
-  const normas = await sql<{ id: string; name: string; domain: string; right_name: string; priority: string }>`select id, name, domain, right_name, priority from fundamento order by id`;
+  const normas = await sql<{ id: string; name: string; domain: string; right_name: string; priority: string; support_id: string | null }>`select id, name, domain, right_name, priority, support_id from fundamento order by id`;
   const pack = await sql<{ sha256: string }>`select sha256 from fundamento_pack where id = 'pacote'`;
   const specimenRows = await sql<{ id: string; title: string; lead: string; source: string }>`select id, title, lead, source from specimen`;
   const moduleRows = await sql<{ specimen_id: string; position: number; type: string; title: string }>`select specimen_id, position, type, title from specimen_module order by position`;
@@ -178,7 +178,7 @@ export const readStoredSite = createServerFn({ method: "GET" }).handler(async ()
     rejected: tokens.filter((row) => on(row.rejected)),
     families,
     templates,
-    normas: normas.map((row) => ({ id: row.id, name: row.name, domain: row.domain, right: row.right_name, priority: row.priority })),
+    normas: normas.map((row) => ({ id: row.id, name: row.name, domain: row.domain, right: row.right_name, priority: row.priority, supportId: row.support_id })),
     packSha: pack[0]?.sha256 ?? "",
     specimens,
     pages,

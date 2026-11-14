@@ -1,8 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { formatNumber, type ToolSuccess } from "@/lib/tools/engine";
+import { formatNumber, reductionNote, type ToolSuccess } from "@/lib/tools/engine";
+import { roundFinite } from "@/lib/tools/numeric-rule";
 
 export function Meter({ value, max, label }: { value: number; max: number; label: string }) {
-  const pct = max > 0 ? Math.max(0, Math.min(100, Math.round((value / max) * 100))) : 0;
+  const pct = max > 0 ? Math.max(0, Math.min(100, roundFinite((value / max) * 100, 0))) : 0;
   return (
     <div className="meter" aria-hidden="true">
       <span className="meter-bar" style={{ width: `${pct}%` }} />
@@ -29,6 +30,7 @@ export function ScoreCard({ result }: { result: ToolSuccess }) {
         </p>
       )}
       {result.band ? <span className={`score-pill tone-bg-${result.band.tone}`}>{result.band.label}</span> : null}
+      {result.reduced ? <p className="tool-help">{reductionNote(result)}</p> : null}
     </div>
   );
 }

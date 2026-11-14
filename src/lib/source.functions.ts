@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+import { admitSyntax } from "@/core/runtime/admit";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { approveItemTx, approveSpecificationTx, saveGovernanceDraftTx } from "@/lib/governance";
 import { decide } from "@/lib/policy-decision";
@@ -178,7 +178,7 @@ export const saveTool = createServerFn({ method: "POST" })
   .inputValidator((input: { slug: string; title: string; lead: string; published: boolean }) => {
     const title = input.title.trim();
     const lead = input.lead.trim();
-    if (!known.has(input.slug) || title.length < 3 || title.length > 80 || lead.length < 10 || lead.length > 400) {
+    if (!known.has(input.slug) || !admitSyntax("texto de 3 a 80 caracteres", title).ok || !admitSyntax("texto de 10 a 400 caracteres", lead).ok) {
       throw new Error("Título ou texto fora do limite.");
     }
     return { slug: input.slug, title, lead, published: input.published === true };
@@ -209,7 +209,7 @@ export const saveClinicalSheet = createServerFn({ method: "POST" })
   .inputValidator((input: { slug: string; title: string; lead: string; published: boolean }) => {
     const title = input.title.trim();
     const lead = input.lead.trim();
-    if (!known.has(input.slug) || title.length < 3 || title.length > 80 || lead.length < 10 || lead.length > 400) {
+    if (!known.has(input.slug) || !admitSyntax("texto de 3 a 80 caracteres", title).ok || !admitSyntax("texto de 10 a 400 caracteres", lead).ok) {
       throw new Error("Título ou texto fora do limite.");
     }
     return { slug: input.slug, title, lead, published: input.published === true };

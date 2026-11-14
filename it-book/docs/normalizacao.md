@@ -60,7 +60,7 @@ Nestas tabelas a 2FN não se aplica. A 3FN vale porque o texto de uma coluna nã
 | inst_page | path | — | título, linha fina, lead, tipo |
 | library_shelf | id | — | posição, título, lead, tipo |
 | editorial_template | id | — | posição, tipo, nome, categoria, descrição |
-| fundamento | id | — | nome, domínio, direito, prioridade |
+| fundamento | id | governance_item | nome, domínio, direito, prioridade, documento interno |
 | policy_part | id | — | posição, rótulo, ajuda |
 | media_asset | path | — | tipo, nota |
 | crawl_rule | position | — | diretiva |
@@ -73,6 +73,9 @@ Nestas tabelas a 2FN não se aplica. A 3FN vale porque o texto de uma coluna nã
 | screen_dest | id | — | tipo, lugar, ferramenta, âncora, página, modelo |
 | study_item | id | — | tipo, ordem, enunciado, verso, índice da resposta |
 | template_contract | id | — | ordem, nome, endereço, tipo, moldura, nota, situação, origem |
+| exam_intake | id | canonical_key; remote_id | órgão, ano, banca, UF, nível, cargo, especialidade, data, status remoto, proveniência, situação |
+| exam_question_intake | id | remote_id; exam_id + position | enunciado, disciplina, tema, subtema, status remoto |
+| exam_key_intake | question_id | — | letra como veio, letra normalizada, tipo do gabarito, status remoto do gabarito |
 | ops_record | id | — | módulo, tipo, título, estado, nota, data |
 | repo_source | repo | — | nota |
 
@@ -129,8 +132,10 @@ Nestas tabelas a 2FN não se aplica. A 3FN vale porque o texto de uma coluna nã
 | section_block | slug + position | O bloco é desta seção nesta posição |
 | section_link | slug + block_position + position | O item é deste bloco nesta posição |
 | study_choice | item_id + position | O texto é desta alternativa nesta questão. A posição 1 não é a mesma alternativa em outra questão |
+| exam_option_intake | question_id + letter_norm | O texto e a posição são desta letra nesta questão. A letra A não é a mesma alternativa em outra questão. A posição também identifica a letra, por inteiro |
 | media_alt | path + locale | O texto é desta imagem neste idioma. O mesmo caminho tem outro texto noutro idioma |
 | repo_branch | repo + branch | O commit é desta branch neste repositório. A mesma branch noutro repositório não é o mesmo commit |
+| repo_branch_commit | repo + branch + commit | O estado é deste commit nesta branch. O mesmo commit noutro repositório não é o mesmo registro |
 | repo_file | repo + branch + path | O blob e o confronto são deste caminho nesta branch. O commit ficou em repo_branch |
 
 Em `tool_faq`, a resposta não depende da pergunta sozinha. Depende da ferramenta e da posição. Isso é o que mantém a 3FN.

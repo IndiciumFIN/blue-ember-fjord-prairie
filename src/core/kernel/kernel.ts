@@ -3,7 +3,7 @@ import type { SignedArtifact } from "./signer";
 import type { Finding } from "./findings";
 import { getRequiredRules, type PolicyBundle } from "../compliance/policy-bundle.ts";
 import { normativeCatalog } from "../compliance/frameworks.ts";
-import { validateRequiredEvidence } from "../compliance/validators.ts";
+import { runRule } from "../compliance/run-rule.ts";
 
 export type ComplianceDecision = {
   ok: boolean;
@@ -26,6 +26,7 @@ export type KernelDecision = {
 export function evaluateCompliance(
   policyBundle: PolicyBundle | null,
   evidence: Record<string, unknown>,
+  env: NodeJS.ProcessEnv = process.env,
 ): ComplianceDecision[] {
   if (!policyBundle) {
     return [{ ok: false, reason: "missing-policy-bundle", outcome: "rejected" }];
@@ -37,7 +38,7 @@ export function evaluateCompliance(
     return [{ ok: false, reason: "policy-bundle-invalid-or-incomplete", outcome: "rejected" }];
   }
   return getRequiredRules(normativeCatalog, ids).map(rule => {
-    const result = validateRequiredEvidence(rule, evidence);
+    const result = runRule(rule, evidence, env);
     return { ok: result.ok, reason: result.reason, ruleId: result.ruleId, outcome: result.outcome };
   });
 }

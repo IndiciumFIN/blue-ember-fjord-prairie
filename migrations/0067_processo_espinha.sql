@@ -1,0 +1,61 @@
+-- Espinha da camada 3. Não descreve carga, repositório nem comando. Não admite ordem.
+
+insert into schema_column (entity, name, data_type, required, key_part, ref_entity, definition, syntax, unit)
+values
+  ('process', 'id', 'texto', true, true, null, 'Identidade do processo que liga ou desliga.', 'texto', null),
+  ('process', 'enabled', 'booleano', true, false, null, 'Se o processo está ligado.', 'booleano', null),
+  ('process', 'updated_by', 'texto', false, false, null, 'Quem alterou. Texto solto, não é chave para user.', 'texto', null),
+  ('process', 'updated_at', 'instante', true, false, null, 'Quando o processo foi alterado.', 'instante', null),
+  ('process_setting', 'process_id', 'texto', true, true, 'process', 'Processo deste ajuste.', 'id de process', null),
+  ('process_setting', 'key', 'texto', true, true, null, 'Nome do ajuste.', 'texto', null),
+  ('process_setting', 'value', 'texto', true, false, null, 'Valor do ajuste.', 'texto', null),
+  ('governance_item', 'id', 'texto', true, true, null, 'Identidade do documento interno.', 'texto', null),
+  ('governance_item', 'kind', 'texto', true, false, null, 'Tipo do documento.', 'objetivo, escopo, risco ou politica', null),
+  ('governance_item', 'title', 'texto', true, false, null, 'Título do documento.', 'texto', null),
+  ('governance_item', 'body', 'texto', true, false, null, 'Texto interno. Não é cláusula de norma.', 'texto', null),
+  ('governance_item', 'status', 'texto', true, false, null, 'Nasce em rascunho.', 'rascunho ou aprovado', null),
+  ('governance_item', 'approved_by', 'texto', false, false, null, 'Pessoa que aprovou. Não é o kernel.', 'texto', null),
+  ('governance_item', 'approved_at', 'instante', false, false, null, 'Quando a pessoa aprovou.', 'instante', null),
+  ('document_version', 'item_id', 'texto', true, true, 'governance_item', 'Documento desta versão.', 'id de governance_item', null),
+  ('document_version', 'version', 'inteiro', true, true, null, 'Número da versão congelada.', 'inteiro', null),
+  ('document_version', 'title', 'texto', true, false, null, 'Título congelado.', 'texto', null),
+  ('document_version', 'body', 'texto', true, false, null, 'Texto congelado.', 'texto', null),
+  ('document_version', 'status', 'texto', true, false, null, 'Estado congelado.', 'texto', null),
+  ('document_version', 'approved_by', 'texto', false, false, null, 'Pessoa registrada na versão.', 'texto', null),
+  ('document_version', 'approved_at', 'instante', false, false, null, 'Quando a versão foi aprovada.', 'instante', null),
+  ('document_version', 'reason', 'texto', true, false, null, 'Motivo da versão.', 'texto', null),
+  ('schema_layer', 'id', 'texto', true, true, null, 'Identidade da camada.', 'texto', null),
+  ('schema_layer', 'label', 'texto', true, false, null, 'Nome da camada.', 'texto', null),
+  ('schema_layer', 'position', 'inteiro', true, false, null, 'Ordem da camada.', 'inteiro maior que zero', null),
+  ('schema_entity', 'name', 'texto', true, true, null, 'Nome da tabela descrita.', 'texto', null),
+  ('schema_entity', 'layer_id', 'texto', true, false, 'schema_layer', 'Camada desta tabela.', 'id de schema_layer', null),
+  ('schema_entity', 'primary_key', 'texto', true, false, null, 'Chave descrita, não a constraint.', 'texto', null),
+  ('schema_entity', 'purpose', 'texto', true, false, null, 'Para que a tabela existe.', 'texto', null),
+  ('schema_entity', 'links', 'texto', true, false, null, 'Ligação escrita. A relação oficial está em schema_relation.', 'texto', null),
+  ('schema_column', 'entity', 'texto', true, true, 'schema_entity', 'Tabela desta coluna.', 'nome de schema_entity', null),
+  ('schema_column', 'name', 'texto', true, true, null, 'Nome da coluna.', 'texto', null),
+  ('schema_column', 'data_type', 'texto', true, false, null, 'Tipo no dicionário.', 'texto', null),
+  ('schema_column', 'required', 'booleano', true, false, null, 'Se a coluna é obrigatória.', 'booleano', null),
+  ('schema_column', 'key_part', 'booleano', true, false, null, 'Se a coluna faz parte da chave.', 'booleano', null),
+  ('schema_column', 'ref_entity', 'texto', false, false, 'schema_entity', 'Tabela apontada, quando há chave.', 'nome de schema_entity', null),
+  ('schema_column', 'definition', 'texto', true, false, null, 'O que a coluna guarda.', 'texto', null),
+  ('schema_column', 'syntax', 'texto', true, false, null, 'Sintaxe aceita.', 'texto', null),
+  ('schema_column', 'unit', 'texto', false, false, null, 'Unidade, quando existe.', 'texto', null),
+  ('policy_package', 'id', 'texto', true, true, null, 'Identidade do pacote de regras.', 'texto', null),
+  ('policy_package', 'title', 'texto', true, false, null, 'Nome do pacote.', 'texto', null),
+  ('policy_package', 'status', 'texto', true, false, null, 'Estado do pacote.', 'rascunho ou ativo', null),
+  ('fundamento', 'id', 'texto', true, true, null, 'Identificador público da norma. Não é a cláusula.', 'texto', null),
+  ('fundamento', 'name', 'texto', true, false, null, 'Nome público.', 'texto', null),
+  ('fundamento', 'domain', 'texto', true, false, null, 'Domínio do identificador.', 'texto', null),
+  ('fundamento', 'right_name', 'texto', true, false, null, 'Direito registrado. Não deposita o texto.', 'texto', null),
+  ('fundamento', 'priority', 'texto', true, false, null, 'Prioridade do identificador.', 'texto', null)
+on conflict (entity, name) do nothing;
+
+insert into schema_relation (from_entity, name, to_entity, cardinality, from_column, to_column, definition)
+values
+  ('process', 'ajustes', 'process_setting', '1:N', 'id', 'process_id', 'Um processo tem zero ou mais ajustes.'),
+  ('governance_item', 'versoes', 'document_version', '1:N', 'id', 'item_id', 'Um documento tem zero ou mais versões congeladas.'),
+  ('schema_layer', 'tabelas', 'schema_entity', '1:N', 'id', 'layer_id', 'Uma camada tem uma ou mais tabelas descritas.'),
+  ('schema_entity', 'colunas', 'schema_column', '1:N', 'name', 'entity', 'Uma tabela descrita tem uma ou mais colunas.'),
+  ('policy_package', 'regras', 'policy_rule', '1:N', 'id', 'package_id', 'Um pacote tem uma ou mais regras.')
+on conflict (from_entity, name) do nothing;

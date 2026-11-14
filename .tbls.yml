@@ -1,0 +1,87 @@
+# Visão do catálogo físico. Não é o dicionário.
+# comments e relations foram omitidos de propósito: os dois substituem o que está no banco.
+# A fonte continua schema_column, schema_relation e a migration 0069.
+
+dsn: ${TBLS_DSN}
+docPath: docs/db
+
+exclude:
+  - _migrations
+
+detectVirtualRelations:
+  enabled: false
+
+lint:
+  requireTableComment:
+    enabled: false
+  requireColumnComment:
+    enabled: false
+  requireIndex:
+    enabled: false
+  unrelatedTable:
+    enabled: true
+    exclude:
+      - audit_event
+      - color_token
+      - crawl_rule
+      - fundamento_pack
+      - ops_record
+      - phase_note
+      - policy_ack
+      - policy_part
+      - sitemap_url
+      - specialty
+      - template_contract
+      - template_family
+      - verification
+  columnCount:
+    enabled: false
+
+er:
+  skip: false
+  format: mermaid
+  comment: false
+  hideDef: false
+
+viewpoints:
+  - id: identidade
+    name: Identidade
+    desc: Pessoa, sessão, vínculo e código. O código não aponta para a pessoa.
+    tables:
+      - user
+      - session
+      - account
+      - verification
+  - id: acesso
+    name: Acesso
+    desc: Papel, assinatura e recado. Os três apontam para a pessoa.
+    tables:
+      - user
+      - member
+      - subscription
+      - community_post
+  - id: processo
+    name: Processo
+    desc: Documento, regra, dicionário e pedido. O pedido aponta para a pessoa.
+    tables:
+      - governance_item
+      - document_version
+      - fundamento
+      - policy_package
+      - policy_rule
+      - schema_layer
+      - schema_entity
+      - schema_column
+      - schema_relation
+      - schema_domain
+      - schema_term
+      - metadata_element
+      - kernel_order
+      - user
+  - id: clinico
+    name: Clínico
+    desc: Capa e conta. Não inclui dado de paciente.
+    tables:
+      - source_tool
+      - tool_formula
+      - tool_formula_step

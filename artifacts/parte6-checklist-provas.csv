@@ -1,0 +1,11 @@
+canonical_key,orgao,ano,nivel,banca,uf,cargo,especialidade,data,questoes,letras,gabarito_nulo,numeros_sem_letra,portao_estrutural,aprovacao_humana,gravada
+2025|FGV|EBSERH|GRUPO_ENFERMAGEM|TIPO1,EBSERH,2025,ENFERMEIRO,FGV,,Grupo Enfermagem (caderno compartilhado),MULTIESPECIALIDADE,2025-03-16,60,5-5,1,36,bloqueada,nao_executada,nao
+2025|FGV|EBSERH|TECNICO_ENFERMAGEM_SAUDE_TRABALHADOR|TIPO1,EBSERH,2025,TECNICO,FGV,,Técnico em Enfermagem - Saúde do Trabalhador,SAUDE_DO_TRABALHADOR,2025-03-16,60,5-5,3,13 14 19,bloqueada,nao_executada,nao
+2025|FGV|EBSERH|TECNICO_ENFERMAGEM|TIPO1,EBSERH,2025,TECNICO,FGV,,Técnico em Enfermagem,GENERALISTA,2025-03-16,60,5-5,4,13 14 19 59,bloqueada,nao_executada,nao
+2025|VUNESP|HCFAMEMA|ENFERMEIRO,HCFAMEMA,2025,ENFERMEIRO,VUNESP,SP,Enfermeiro,GENERALISTA,2025-05-18,50,5-5,0,,passa,nao_executada,nao
+2025|FGV|SAO_JOSE_DOS_CAMPOS_SP|ENFERMEIRO|TIPO1,Prefeitura de São José dos Campos/SP,2025,ENFERMEIRO,FGV,SP,Analista em Saúde - Enfermagem,GENERALISTA,2025-08-31,70,5-5,2,29 57,bloqueada,nao_executada,nao
+2025|FGV|SAO_JOSE_DOS_CAMPOS_SP|TECNICO_ENFERMAGEM|TIPO1,Prefeitura de São José dos Campos/SP,2025,TECNICO,FGV,SP,Assistente Técnico em Saúde - Técnico de Enfermagem,GENERALISTA,2025-08-31,60,5-5,0,,passa,nao_executada,nao
+2025|VUNESP|SOROCABA_SP|ENFERMEIRO,Prefeitura de Sorocaba/SP,2025,ENFERMEIRO,VUNESP,SP,Enfermeiro,GENERALISTA,2025-11-30,50,5-5,0,,passa,nao_executada,nao
+2025|INSTITUTO_AOCP|SANESUL|TECNICO_ENFERMAGEM_TRABALHO,SANESUL,2025,TECNICO,INSTITUTO AOCP,MS,Técnico em Enfermagem do Trabalho,ENFERMAGEM_DO_TRABALHO,2025-05-04,60,5-5,1,52,bloqueada,nao_executada,nao
+2025|VUNESP|UNESP|ENFERMEIRO_SAUDE_MENTAL,UNESP,2025,ENFERMEIRO,VUNESP,SP,Enfermeiro - Saúde Mental,SAUDE_MENTAL,2025-09-28,40,5-5,0,,passa,nao_executada,nao
+2026|VUNESP|OSASCO_SP|TECNICO_ENFERMAGEM_TRABALHO,Prefeitura de Osasco/SP,2026,TECNICO,VUNESP,SP,Técnico de Enfermagem do Trabalho,ENFERMAGEM_DO_TRABALHO,2026-02-08,40,5-5,0,,passa,nao_executada,nao
