@@ -78,3 +78,15 @@ jobs:
       - run: npm run build:spa
       - name: Verificar arquivos estaticos basicos
         run: test -s .vercel/output/nitro.json && test -d .vercel/output/functions/__server.func && test -s .vercel/output/static/sitemap.xml && test -s .vercel/output/static/robots.txt
+      # Evidence-only: preserve the complete negative gate report for review.
+      # Does not authorize source routes, publish clinical data or deploy.
+      - name: Preservar diagnosticos completos de contratos e gates
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ncos-surface-and-execution-gates
+          path: |
+            registers/canonical/surface-binding-register.v2.json
+            audit/execution/execution-gates-latest.json
+          if-no-files-found: warn
+          retention-days: 14
