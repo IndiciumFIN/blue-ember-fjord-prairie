@@ -14,6 +14,7 @@ test("conteúdo e clínico ficam sem coluna muda e a plataforma continua aberta"
     from schema_column as column_row
     join schema_entity as entity on entity.name = column_row.entity
     where column_row.definition = 'Coluna física sem definição humana.'
+      and entity.layer_id in ('conteudo', 'clinico')
     group by entity.layer_id
     order by entity.layer_id
   `);
