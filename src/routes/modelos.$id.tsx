@@ -14,6 +14,8 @@ import { readEditorial } from "@/lib/stored.functions";
 import { unflatten, useStored } from "@/lib/stored";
 import { lorem, loremData } from "@/lib/lorem";
 import { ContractView } from "@/components/templates/contract-view";
+import { CanonicalContentFamilyView } from "@/components/templates/canonical-content-family-view";
+import { canonicalFamilyById } from "@/lib/canonical-content-families";
 import { recoveredTemplate } from "@/components/templates/recovered-templates";
 import { catalogById } from "@/lib/template-catalog";
 import { parseLocale } from "@/lib/translate";
@@ -61,6 +63,8 @@ function Modelo() {
   if (data.kind === "institucional") return <Shell><InstitutionalTemplate /></Shell>;
   if (data.kind === "slides") return <Shell><SlideDeck /></Shell>;
   if (data.kind === "contrato") {
+    const family = canonicalFamilyById(data.row.id);
+    if (family) return <Shell><CanonicalContentFamilyView family={family} /></Shell>;
     const Recovered = recoveredTemplate(data.row.id);
     return <Shell>{Recovered ? <Recovered /> : <ContractView row={data.row} />}</Shell>;
   }
