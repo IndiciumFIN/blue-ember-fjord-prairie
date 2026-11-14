@@ -2,6 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArticlePage } from "@/components/article/article-page";
 import { AreaFrame, AreaGuard } from "@/components/site/areas";
+import { MemberIdentityPanel } from "@/components/site/member-identity";
 import { CommunityBoard } from "@/components/site/community";
 import { readCatalog, type SourceTool } from "@/lib/source.functions";
 
@@ -39,6 +40,7 @@ function AssinanteHome() {
       title="O que a fonte publicou"
       lead="Esta tela não é o site público. Ela só abre o que o administrador deixou publicado. O cálculo em si continua o mesmo."
     >
+      <MemberIdentityPanel />
       {rows === null ? <p className="tool-help">Lendo a fonte…</p> : null}
       <ul className="related-grid">
         {published.map((tool) => (
