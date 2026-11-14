@@ -1,5 +1,6 @@
--- Ambiente de teste. Abre o que já tem corpo e a capa das ferramentas.
--- Não homologa cálculo. Corpo vazio, modelo canônico e ficha de norma sem texto ficam em rascunho.
+-- Prévia local, sem DATABASE_URL. O migrate remoto não lê esta pasta.
+-- Abre o que já tem corpo e a capa das ferramentas. Não homologa cálculo.
+-- Corpo vazio, modelo canônico e ficha de norma sem texto ficam em rascunho.
 -- Não mexe em texto alternativo, regra de negócio nem ordem do kernel.
 
 update content_text

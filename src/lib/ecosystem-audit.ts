@@ -15,6 +15,8 @@ type Queryable = {
   query<T extends Row>(sql: string): Promise<{ rows: T[] }>;
 };
 
+const governed = ["apgar", "braden", "gotejamento", "imc", "morse"];
+
 function numberOf(value: unknown) {
   return typeof value === "number" ? value : Number(value);
 }
@@ -30,6 +32,22 @@ export async function auditEcosystem(db: Queryable): Promise<AuditFinding[]> {
   if (numberOf(empty.rows[0]?.n) > 0) {
     block("PUB-CORPO", "Política de dado: rascunho vazio não abre", `${empty.rows[0]?.n} textos publicados sem corpo`);
   }
+
+  const openTools = await db.query<{ slug: string }>("select slug from source_tool where published order by slug");
+  const open = openTools.rows.map((row) => row.slug);
+  if (open.join() !== governed.join()) {
+    block("CLI-CAPA", "Capa publicada só das cinco ferramentas com fórmula", open.join(", ") || "nenhuma");
+  }
+
+  const bare = await db.query<{ slug: string }>(
+    `select tool.slug
+     from source_tool as tool
+     where tool.published
+       and not exists (select 1 from tool_formula as formula where formula.tool_slug = tool.slug)
+       and not exists (select 1 from tool_criterion as criterion where criterion.tool_slug = tool.slug)
+       and not exists (select 1 from tool_field as field where field.tool_slug = tool.slug)`,
+  );
+  if (bare.rows.length > 0) block("CLI-FORMULA", "Instrumento publicado precisa de fórmula, critério ou campo", bare.rows.map((row) => row.slug).join(", "));
 
   const kernel = await db.query<{ n: unknown }>(
     `select count(*)::int as n from (

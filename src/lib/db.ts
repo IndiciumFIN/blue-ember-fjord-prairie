@@ -131,13 +131,16 @@ async function createPgliteSql(): Promise<Sql> {
   });
   const pg = await globalRef.__pgliteInstance__;
 
-  // Apply migrations/ (the single schema source) so preview matches production.
-  // SQL is inlined by the bundler via import.meta.glob (no runtime fs); applied
-  // files are tracked in _migrations. The glob does not descend, so the opt-in
-  // auth schema under migrations/auth/ stays out. A new file is applied when this
-  // module loads again. Each pass stays serialized and callers never double-apply.
+  // Root migrations match what scripts/migrate.mjs applies to DATABASE_URL.
+  // migrations/preview/*.sql is the local preview only. Do not copy it up:
+  // db:migrate would publish it on the remote database without admission.
   const migrate = async (): Promise<void> => {
     const migrations = import.meta.glob("/migrations/*.sql", {
+      query: "?raw",
+      import: "default",
+      eager: true,
+    }) as Record<string, string>;
+    const preview = import.meta.glob("/migrations/preview/*.sql", {
       query: "?raw",
       import: "default",
       eager: true,
@@ -146,11 +149,17 @@ async function createPgliteSql(): Promise<Sql> {
       "select name from _migrations",
     );
     const done = doneRows.rows.map((r) => r.name);
-    for (const { name, path } of pendingMigrations(Object.keys(migrations), done)) {
+    const rootPending = pendingMigrations(Object.keys(migrations), done);
+    const previewPending = pendingMigrations(
+      Object.keys(preview),
+      [...done, ...rootPending.map((item) => item.name)],
+    );
+    const sqlOf = { ...migrations, ...preview };
+    for (const { name, path } of [...rootPending, ...previewPending]) {
       // Apply + record atomically (parity with scripts/migrate.mjs) so a failed
       // statement can't leave a file half-applied but untracked.
       await pg.transaction(async (tx) => {
-        await tx.exec(migrations[path]);
+        await tx.exec(sqlOf[path]);
         await tx.query("insert into _migrations (name) values ($1)", [name]);
       });
     }

@@ -69,6 +69,12 @@ test("the repository migration plan includes real root SQL files and preserves t
   );
   assert.equal(new Set(pending.map(({ name }) => name)).size, rootSql.length);
   assert.ok(readdirSync(join(migrationsDir, "auth")).includes("0001_auth.sql"));
+  assert.equal(rootSql.includes("0086_publicacao_teste.sql"), false, "preview publication must not be a root migration");
+  assert.ok(existsSync(join(migrationsDir, "preview", "0086_publicacao_teste.sql")));
+  const migrator = readFileSync(join(projectRoot(), "scripts/migrate.mjs"), "utf8");
+  assert.match(migrator, /readdir\(migrationsDir\)/);
+  assert.match(migrator, /migrations\/preview\/ stay/);
+  assert.equal(/readdir\([^)]*preview/.test(migrator), false);
   // If a copy was promoted into root, its source must remain and bytes must agree.
   if (rootSql.includes(AUTH_MIGRATION)) {
     const pair = authSchemaCopy(projectRoot());
