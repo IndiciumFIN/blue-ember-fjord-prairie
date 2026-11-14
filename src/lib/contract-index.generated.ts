@@ -1168,15 +1168,15 @@ export const contractBrand = [
   {
     "id": "CE-BRAND-LOGO-SVG",
     "file": "public/brand/logo.svg",
-    "status": "live",
-    "papel": "marca-primaria",
-    "nota": "Vetor vetorial canônico usado no header. Mantém legibilidade em qualquer densidade de tela e evita distorção do raster anterior."
+    "status": "superseded",
+    "supersededBy": "CE-BRAND-LOGO-WEBP",
+    "nota": "Ícone vetorial criado no repositório. Não é o logotipo oficial e não entra no cabeçalho."
   },
   {
     "id": "CE-BRAND-LOGO-WEBP",
     "file": "public/brand/logo.webp",
-    "status": "superseded",
-    "supersededBy": "CE-BRAND-LOGO-SVG",
-    "nota": "Raster legado, mantido apenas como referência e não utilizado pela aplicação."
+    "status": "live",
+    "papel": "marca-primaria",
+    "nota": "Logotipo oficial do release. A palavra já está na imagem, então o cabeçalho não repete o nome ao lado."
   }
 ] as const;

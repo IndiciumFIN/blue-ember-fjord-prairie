@@ -6,7 +6,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
-import { PageHero } from '@/components/site/page-hero';
+import { PageHero } from "@/components/page-hero";
 import { Breadcrumb } from '@/components/site/breadcrumb';
 import { tools } from '@/lib/tools/catalog';
 import { templateCatalogo } from '@/lib/template-catalog';

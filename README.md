@@ -15,7 +15,7 @@ O objetivo deste projeto é manter uma base pública, auditável e governada par
 
 Este workspace opera com política explícita:
 - autenticação desligada por padrão (`VITE_AUTH_ENABLED=false`)
-- banco desligado por política do backup público (`DB_ENABLED = false`)
+- banco local embutido ligado. O remoto só abre se `DATABASE_URL` existir. Não há `DB_ENABLED = false` neste runtime
 - conteúdo clínico fora do índice até ter fonte e validação humanas
 - `md_gate` fechado para publicação/"release" formal
 

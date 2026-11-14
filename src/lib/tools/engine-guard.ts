@@ -36,6 +36,6 @@ export function admitEngineResult(result: ToolSuccess | ToolFailure): ToolSucces
 
 export function renderAdmittedResult(result: ToolSuccess | ToolFailure): ToolSuccess | null {
   const step = admitStep("renderer", result, (value) => validateEngineResult(value));
-  if (step.outcome !== "admit") return null;
+  if (step.outcome !== "admit" || !step.value.ok) return null;
   return step.value;
 }

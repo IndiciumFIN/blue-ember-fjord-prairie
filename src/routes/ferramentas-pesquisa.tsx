@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ArticlePage } from "@/components/article/article-page";
 import { Shell } from "@/components/site/shell";
-import { PageHero } from "@/components/site/page-hero";
 import { BookmarkIcon, FileTextIcon, FolderIcon, QuoteIcon, DatabaseIcon, FlaskConicalIcon, DownloadIcon, UploadIcon } from "lucide-react";
 import { SourcesPanel } from "@/components/research/sources-panel";
 import { ReferencesPanel } from "@/components/research/references-panel";
@@ -81,12 +81,13 @@ function ResearchPage() {
 
   return (
     <Shell>
-      <main id="conteudo" className="page-wide">
-        <PageHero
-          eyebrow="Ferramentas · Pesquisador Científico"
-          title="Ferramentas de Pesquisa Acadêmica"
-          lead="Gerador de citações ABNT NBR 6023:2018, gerenciador de fontes bibliográficas e estruturador de PICO — voltado para pesquisadores, pós-graduandos e profissionais de enfermagem com produção científica."
-        />
+      <ArticlePage
+        kind="editorial"
+        crumbs={[{ label: "Início", to: "/" }, { label: "Pesquisa" }]}
+        eyebrow="Ferramentas · Pesquisador Científico"
+        title="Ferramentas de Pesquisa Acadêmica"
+        lead="Gerador de citações ABNT NBR 6023:2018, gerenciador de fontes bibliográficas e estruturador de PICO — voltado para pesquisadores, pós-graduandos e profissionais de enfermagem com produção científica."
+      >
 
         <section className="ce-admin-panel" style={{ marginTop: "1.5rem" }}>
           <div
@@ -173,7 +174,7 @@ function ResearchPage() {
           {tab === "sources" && <SourcesPanel />}
           {tab === "pico" && <PicoPanel />}
         </section>
-      </main>
+      </ArticlePage>
     </Shell>
   );
 }

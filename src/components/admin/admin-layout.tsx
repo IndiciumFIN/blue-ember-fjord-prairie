@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { Breadcrumb } from "@/components/site/breadcrumb";
-import { PageHero } from "@/components/site/page-hero";
+import { PageHero } from "@/components/page-hero";
 import { adminContract, type AdminRegion } from "@/lib/admin-contract";
 import { adminGroup, adminGroups, adminModule, adminModules, type AdminPick } from "@/lib/admin-catalog";
 import { statusTone, type DeskModule } from "@/lib/normative-desk";

@@ -43,10 +43,8 @@ function require_<T>(contract: string, value: T | undefined | null, detail: stri
 const brandItems = require_("CE-CONTRACT-BRAND", contractBrand, "marca ausente", 0);
 
 /**
- * O logo que a aplicação carrega é decidido pelo contrato, não pelo componente.
- * `logo.webp` é o original do release. `logo.svg` foi um vetor que eu criei sem
- * autorização e está declarado superseded, mantido em disco e fora do caminho
- * da aplicação.
+ * O logo do cabeçalho é o arquivo com papel marca-primaria.
+ * O oficial é public/brand/logo.webp. O svg ao lado não entra nesse papel.
  */
 export const brandLogo = require_(
   "CE-CONTRACT-BRAND",

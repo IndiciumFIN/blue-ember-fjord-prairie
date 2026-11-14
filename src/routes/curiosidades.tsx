@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ArticlePage } from "@/components/article/article-page";
 import { Shell } from "@/components/site/shell";
-import { PageHero } from "@/components/site/page-hero";
 import { SearchIcon, BookIcon, ChevronDownIcon, ChevronRightIcon, FilterIcon } from "lucide-react";
 import { FUN_FACTS_SEED, FUN_FACTS_TOTAL } from "@/lib/editorial/fun-facts.seed";
 import {
@@ -53,12 +53,13 @@ function CuriosidadesPage() {
 
   return (
     <Shell>
-      <main id="conteudo" className="page-wide">
-        <PageHero
-          eyebrow="Editorial · Curiosidades"
-          title="Curiosidades de Enfermagem"
-          lead={`${releasedCount} fatos curados e publicados sobre a história, pioneiras, profissão e cultura da enfermagem. ${FUN_FACTS_TOTAL - releasedCount} slots adicionais aguardam curadoria.`}
-        />
+      <ArticlePage
+        kind="artigo"
+        crumbs={[{ label: "Início", to: "/" }, { label: "Curiosidades" }]}
+        eyebrow="Editorial · Curiosidades"
+        title="Curiosidades de Enfermagem"
+        lead={`${releasedCount} fatos curados e publicados sobre a história, pioneiras, profissão e cultura da enfermagem. ${FUN_FACTS_TOTAL - releasedCount} slots adicionais aguardam curadoria.`}
+      >
 
         <section style={{ marginTop: "1.5rem" }}>
           {/* Barra de busca + filtros */}
@@ -142,7 +143,7 @@ function CuriosidadesPage() {
             <strong>Curadoria:</strong> Para um fato passar de <code>CANDIDATE</code> para <code>RELEASED</code>, é preciso preencher <code>source_id</code> com uma fonte canônica confiável (COFEN, ABEn, OMS, lei vigente). Os slots reservados aguardam curadoria humana — entrarão no índice público somente após qualificação.
           </div>
         </section>
-      </main>
+      </ArticlePage>
     </Shell>
   );
 }

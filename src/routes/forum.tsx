@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { allows } from "@/lib/cookie-banner";
 import { createFileRoute } from "@tanstack/react-router";
+import { ArticlePage } from "@/components/article/article-page";
 import { Shell } from "@/components/site/shell";
-import { PageHero } from "@/components/site/page-hero";
 import { PlusIcon, SearchIcon, TrashIcon, EditIcon, ChevronLeftIcon, ChevronRightIcon, ThumbsUpIcon, EyeIcon, MessageCircleIcon, PinIcon, DownloadIcon, UploadIcon } from "lucide-react";
 import {
   useForumThreads, exportAll, importAll, generateReplyId,
@@ -33,17 +34,19 @@ function ForumPage() {
   const [editing, setEditing] = useState<ForumThread | null>(null);
   const [viewing, setViewing] = useState<ForumThread | null>(null);
   // Identidade do usuário local (não é login — fica no localStorage)
-  const [userId] = useState(() => localStorage.getItem("ce-forum/user-id") || (() => {
+  const [userId] = useState(() => {
+    const stored = localStorage.getItem("ce-forum/user-id");
+    if (stored) return stored;
     const id = `local-${generateId("USER")}`;
-    localStorage.setItem("ce-forum/user-id", id);
+    if (allows("memory")) localStorage.setItem("ce-forum/user-id", id);
     return id;
-  })());
+  });
   const [userName, setUserName] = useState(() => localStorage.getItem("ce-forum/user-name") || "");
   const [userRole, setUserRole] = useState<AuthorRole>(() => (localStorage.getItem("ce-forum/user-role") as AuthorRole) || "NURSE");
 
   useEffect(() => {
-    localStorage.setItem("ce-forum/user-name", userName);
-    localStorage.setItem("ce-forum/user-role", userRole);
+    if (allows("memory")) localStorage.setItem("ce-forum/user-name", userName);
+    if (allows("memory")) localStorage.setItem("ce-forum/user-role", userRole);
   }, [userName, userRole]);
 
   const filtered = useMemo(() => {
@@ -96,12 +99,13 @@ function ForumPage() {
 
   return (
     <Shell>
-      <main id="conteudo" className="page-wide">
-        <PageHero
-          eyebrow="Comunidade · Discussão local"
-          title="Fórum de Enfermagem"
-          lead="Espaço de discussão para profissionais, estudantes e docentes. Tópicos e respostas ficam salvos localmente no seu navegador. Use exportar/importar para sincronizar entre dispositivos."
-        />
+      <ArticlePage
+        kind="secao"
+        crumbs={[{ label: "Início", to: "/" }, { label: "Fórum" }]}
+        eyebrow="Comunidade · Discussão local"
+        title="Fórum de Enfermagem"
+        lead="Espaço de discussão para profissionais, estudantes e docentes. Tópicos e respostas ficam salvos localmente no seu navegador. Use exportar/importar para sincronizar entre dispositivos."
+      >
 
         <section style={{ marginTop: "1.5rem" }}>
           {/* Identidade do usuário */}
@@ -203,7 +207,7 @@ function ForumPage() {
             <strong>Como funciona:</strong> O fórum é 100% client-side. Tópicos e respostas ficam no seu navegador (localStorage). Não há backend nem moderação centralizada — use com responsabilidade e respeite o sigilo profissional. Para casos clínicos, <strong>nunca</strong> identifique pacientes. Use a visibilidade 'Profissionais only' para tópicos sensíveis.
           </div>
         </section>
-      </main>
+      </ArticlePage>
     </Shell>
   );
 }

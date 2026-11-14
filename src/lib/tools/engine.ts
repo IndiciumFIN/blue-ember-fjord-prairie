@@ -83,7 +83,8 @@ export function evaluateFormula(tool: ClinicalTool, raw: Record<string, string>)
   const outputs = (tool.outputs ?? []).map((output) => {
     const rawValue = computed.outputs[output.id];
     const echoed = Boolean(computed.texts?.[output.id]);
-    const digits = echoed ? typedDigits((tool.fields ?? []).length === 1 ? raw[tool.fields[0].id] : undefined) : output.digits;
+    const fields = tool.fields ?? [];
+    const digits = echoed ? typedDigits(fields.length === 1 ? raw[fields[0].id] : undefined) : output.digits;
     const value = echoed ? rawValue : roundFinite(rawValue, output.digits);
     if (!echoed && value !== rawValue) reduced = true;
     return {
@@ -128,6 +129,12 @@ function shownDigits(value: number) {
   return Math.min(12, fraction.length);
 }
 
+function casas(digits: number) {
+  if (digits === 0) return "sem casa decimal";
+  if (digits === 1) return "com 1 casa decimal";
+  return `com ${digits} casas decimais`;
+}
+
 function formulaSteps(slug: string, values: Record<string, number>, outputs: { id: string; value: number; digits: number }[]) {
   const found = (id: string) => outputs.find((output) => output.id === id);
   if (slug === "gotejamento") {
@@ -136,8 +143,8 @@ function formulaSteps(slug: string, values: Record<string, number>, outputs: { i
     const gotas = found("gotas");
     return [
       `Tempo = ${values.horas} h × 60 + ${values.minutos} min = ${minutes} min.`,
-      `mL/h = ${values.volume} ÷ (${minutes} ÷ 60). Resultado admitido, com ${mlh?.digits ?? 0} casas: ${formatNumber(mlh?.value ?? 0, mlh?.digits ?? 0)}.`,
-      `Gotas/min = (${values.volume} × ${values.fator}) ÷ ${minutes}. Resultado admitido, com ${gotas?.digits ?? 0} casas: ${formatNumber(gotas?.value ?? 0, gotas?.digits ?? 0)}.`,
+      `mL/h = ${values.volume} ÷ (${minutes} ÷ 60). Resultado admitido, ${casas(mlh?.digits ?? 0)}: ${formatNumber(mlh?.value ?? 0, mlh?.digits ?? 0)}.`,
+      `Gotas/min = (${values.volume} × ${values.fator}) ÷ ${minutes}. Resultado admitido, ${casas(gotas?.digits ?? 0)}: ${formatNumber(gotas?.value ?? 0, gotas?.digits ?? 0)}.`,
     ];
   }
   if (slug === "imc") {
@@ -145,7 +152,7 @@ function formulaSteps(slug: string, values: Record<string, number>, outputs: { i
     const imc = found("imc");
     return [
       `Altura em metros = ${values.altura} ÷ 100 = ${formatNumber(metros, shownDigits(metros))}.`,
-      `IMC = ${values.peso} ÷ (${formatNumber(metros, shownDigits(metros))})². Resultado admitido, com ${imc?.digits ?? 0} casas: ${formatNumber(imc?.value ?? 0, imc?.digits ?? 0)}.`,
+      `IMC = ${values.peso} ÷ (${formatNumber(metros, shownDigits(metros))})². Resultado admitido, ${casas(imc?.digits ?? 0)}: ${formatNumber(imc?.value ?? 0, imc?.digits ?? 0)}.`,
     ];
   }
   if (slug === "exames-laboratoriais") {

@@ -2,7 +2,8 @@
  * Store client-side para o Fórum.
  * Mesmo padrão dos outros blocos.
  */
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { allows } from "@/lib/cookie-banner";
 import type { ForumThread, ForumReply } from "./forum-types";
 import { generateId } from "./forum-types";
 
@@ -20,7 +21,7 @@ function readJSON<T>(key: string, fallback: T): T {
   }
 }
 function writeJSON<T>(key: string, value: T): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !allows("memory")) return;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
     window.dispatchEvent(new CustomEvent("ce-editorial:change", { detail: { key } }));

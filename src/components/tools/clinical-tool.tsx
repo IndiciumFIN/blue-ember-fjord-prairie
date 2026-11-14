@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { ReferenceList } from "@/components/article/pieces";
 import { ClinicalForm, type ClinicalPatient, type ClinicalValues } from "@/components/tools/clinical-form";
 import { hasBlock } from "@/lib/component-contract";
@@ -8,7 +8,7 @@ import { ClinicalSheet } from "@/components/tools/clinical-sheet";
 import { ToolEcosystem, ToolFeedback, ToolMeta, ToolTutorial, ToolViewBar, useToolView } from "@/components/tools/tool-desk";
 import { Breadcrumb } from "@/components/site/breadcrumb";
 import { RelatedContent } from "@/components/site/related-content";
-import { PageHero } from "@/components/site/page-hero";
+import { PageHero } from "@/components/page-hero";
 import { PageTools } from "@/components/site/page-tools";
 import { formatNumber, reductionNote, type ToolFailure, type ToolSuccess } from "@/lib/tools/engine";
 import { renderAdmittedResult } from "@/lib/tools/engine-guard";
@@ -58,7 +58,7 @@ export function ClinicalToolPage({ tool, area = "public" }: { tool: ClinicalTool
   const [result, setResult] = useState<ToolSuccess | ToolFailure | null>(null);
   const [notes, setNotes] = useState("");
   const form = useForm<ClinicalValues>({
-    resolver: zodResolver(clinicalSchema(tool)),
+    resolver: zodResolver(clinicalSchema(tool)) as unknown as Resolver<ClinicalValues>,
     defaultValues: {
       kind: tool.kind,
       patient: emptyPatient(tool),
@@ -77,8 +77,8 @@ export function ClinicalToolPage({ tool, area = "public" }: { tool: ClinicalTool
   );
 
   function calculate() {
-    void form.handleSubmit((values) => {
-      const next = runClinical(tool, values);
+    void form.handleSubmit(() => {
+      const next = runClinical(tool, form.getValues());
       setResult(next);
       document.getElementById("resultado")?.focus();
     }, (errors) => {

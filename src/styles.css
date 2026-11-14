@@ -411,28 +411,14 @@ html[data-theme="dark"]:not([data-contrast="high"]) .desktop-nav .nav-guide {
   .brand {
     display: flex;
     align-items: center;
-    gap: 8px;
     flex: 0 0 auto;
-    min-width: 0;
+    min-width: 44px;
+    min-height: 44px;
   }
   .brand img {
-    width: 48px;
+    width: 72px;
     height: 48px;
     object-fit: contain;
-  }
-  .brand-name {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.05;
-    color: var(--color-navy);
-    font-weight: 800;
-    font-size: 13px;
-    letter-spacing: -0.02em;
-  }
-  .brand-name small {
-    font-weight: 600;
-    font-size: 11px;
-    color: var(--color-slate);
   }
 
   .site-search {
@@ -1583,7 +1569,7 @@ html[data-theme="dark"]:not([data-contrast="high"]) .desktop-nav .nav-guide {
     box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
   }
   body:has(.cookie-banner) .site-footer {
-    padding-bottom: 148px;
+    padding-bottom: var(--cookie-offset, 0px);
   }
   .cookie-banner p {
     margin: 0;
@@ -1690,7 +1676,7 @@ html[data-theme="dark"]:not([data-contrast="high"]) .desktop-nav .nav-guide {
     color: #fff;
   }
   body:has(.cookie-banner) .to-top {
-    bottom: 160px;
+    bottom: calc(var(--cookie-offset, 0px) + 16px);
   }
 
   .page-narrow {
@@ -2439,12 +2425,6 @@ html[data-theme="dark"]:not([data-contrast="high"]) .desktop-nav .nav-guide {
       justify-content: space-between;
       padding: 16px 32px;
     }
-    body:has(.cookie-banner) .site-footer {
-      padding-bottom: 96px;
-    }
-    body:has(.cookie-banner) .to-top {
-      bottom: 96px;
-    }
     .footer-grid {
       grid-template-columns: 1fr 1fr;
     }
@@ -2496,9 +2476,6 @@ html[data-theme="dark"]:not([data-contrast="high"]) .desktop-nav .nav-guide {
     .tile-grid {
       grid-template-columns: repeat(7, minmax(0, 1fr));
     }
-    .brand-name {
-      display: flex;
-    }
     .tool-layout {
       grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
     }
@@ -2532,9 +2509,6 @@ html[data-theme="dark"]:not([data-contrast="high"]) .desktop-nav .nav-guide {
     .search-toggle {
       display: flex;
     }
-    .brand-name {
-      display: none;
-    }
   }
 
   @media (max-width: 1100px) {
@@ -2547,9 +2521,6 @@ html[data-theme="dark"]:not([data-contrast="high"]) .desktop-nav .nav-guide {
   }
 
   @media (max-width: 860px) {
-    .brand-name {
-      display: none;
-    }
     .a11y-label {
       position: absolute;
       width: 1px;

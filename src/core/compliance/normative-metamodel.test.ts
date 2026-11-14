@@ -6,7 +6,7 @@ import { auditPlatformConclusion } from "./platform-conclusion.ts";
 
 test("o metamodelo local vira identificador e regra parafraseada, sem cláusula", async () => {
   const meta = JSON.parse(await readFile(new URL("../../../attachments/metamodelo-normativos.json", import.meta.url), "utf8"));
-  const norms = meta.tabelas.meta_normativo.filter((row) => row.texto_protegido_reproduzido === false);
+  const norms = meta.tabelas.meta_normativo.filter((row: { texto_protegido_reproduzido: boolean }) => row.texto_protegido_reproduzido === false);
   const rules = meta.tabelas.meta_regra_normativa;
   const db = new PGlite();
   const base = new URL("../../../migrations/", import.meta.url);

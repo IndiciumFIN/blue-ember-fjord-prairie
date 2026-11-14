@@ -1,3 +1,4 @@
+import { createServerFn } from "@tanstack/react-start";
 import { admitSyntax } from "@/core/runtime/admit";
 import { authMiddleware } from "@/lib/auth/middleware";
 import { approveItemTx, approveSpecificationTx, saveGovernanceDraftTx } from "@/lib/governance";
@@ -115,7 +116,7 @@ export const readCatalog = createServerFn({ method: "GET" }).handler(async () =>
 
 export const readTool = createServerFn({ method: "GET" })
   .inputValidator((slug: string) => {
-    if (!/^[a-z0-9-]{1,80}$/.test(slug)) throw new Error("Ferramenta fora da fonte.");
+    if (!/^[a-z0-9_-]{1,80}$/.test(slug)) throw new Error("Ferramenta fora da fonte.");
     return slug;
   })
   .handler(async ({ data: slug }) => {

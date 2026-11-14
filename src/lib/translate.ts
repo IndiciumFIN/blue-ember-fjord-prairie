@@ -1,3 +1,4 @@
+import { allows } from "@/lib/cookie-banner";
 import type { Locale } from "@/lib/chrome";
 import { boundLabel } from "@/lib/menu-bind";
 
@@ -21,6 +22,7 @@ let queue: Promise<void> = Promise.resolve();
 
 function remember(key: string, value: string) {
   memory.set(key, value);
+  if (!allows("translation")) return;
   try {
     sessionStorage.setItem(key, value);
   } catch {

@@ -34,5 +34,5 @@ test("o resolver do formulário usa o mesmo schema do portão", async () => {
   const valid = await resolver({ kind: "calculadora", patient, raw: { peso: "70", altura: "170" } }, {}, {} as never);
   assert.deepEqual(valid.errors, {});
   const invalid = await resolver({ kind: "calculadora", patient, raw: { peso: "abc", altura: "170" } }, {}, {} as never);
-  assert.ok(invalid.errors.raw);
+  assert.ok("raw" in invalid.errors && invalid.errors.raw);
 });

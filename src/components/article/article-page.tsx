@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Breadcrumb, type Crumb } from "@/components/site/breadcrumb";
-import { PageHero } from "@/components/site/page-hero";
+import { PageHero } from "@/components/page-hero";
 import { PageToc } from "@/components/site/page-toc";
 import { PageTools } from "@/components/site/page-tools";
 import { contractOf, type TemplateKind } from "@/lib/template-contract";

@@ -2,7 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { Accessibility, ArrowUp, ChevronDown, Instagram, Linkedin, Menu, Search, X, Youtube } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AccountSlot, MobileNav, SiteNav } from "@/components/site/site-nav";
-import { useChrome, type FocusColor, type OptionalConsent } from "@/lib/chrome";
+import { cookieCategories, syncCookieOffset, type OptionalConsent } from "@/lib/cookie-banner";
+import { useChrome, type FocusColor } from "@/lib/chrome";
 import { brandLogo } from "@/lib/contracts";
 import { focusColorName } from "@/lib/focus-color-i18n";
 import { selectableLocales } from "@/lib/header-i18n";
@@ -25,8 +26,10 @@ export function Shell({ children, editions = [], currentPath }: { children: Reac
   const [shortcuts, setShortcuts] = useState(false);
   const [showTop, setShowTop] = useState(false);
   const [prefsOpen, setPrefsOpen] = useState(false);
-  const [cookieDraft, setCookieDraft] = useState<OptionalConsent>({ translation: false, audience: false });
+  const [cookieDraft, setCookieDraft] = useState<OptionalConsent>({ translation: false, audience: false, memory: false });
   const dialogRef = useRef<HTMLDivElement>(null);
+  const cookieBannerRef = useRef<HTMLDivElement>(null);
+  const cookieDialogRef = useRef<HTMLDivElement>(null);
   const shortcutBtn = useRef<HTMLButtonElement>(null);
   const menuBtn = useRef<HTMLButtonElement>(null);
   const langBtn = useRef<HTMLButtonElement>(null);
@@ -140,6 +143,28 @@ export function Shell({ children, editions = [], currentPath }: { children: Reac
   }, [shortcuts]);
 
   useEffect(() => {
+    const banner = chrome.consent === "unknown" && !prefsOpen ? cookieBannerRef.current : null;
+    syncCookieOffset(banner);
+    if (!banner) return;
+    const measure = () => syncCookieOffset(cookieBannerRef.current);
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("resize", measure);
+      syncCookieOffset(null);
+    };
+  }, [chrome.consent, prefsOpen]);
+
+  useEffect(() => {
+    if (!prefsOpen) return;
+    cookieDialogRef.current?.querySelector<HTMLElement>("input, button")?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPrefsOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [prefsOpen]);
+
+  useEffect(() => {
     function visible(selector: string) {
       const el = document.querySelector(selector);
       if (!el) return false;
@@ -186,7 +211,7 @@ export function Shell({ children, editions = [], currentPath }: { children: Reac
   const footer = storedFooter(stored.labels, /^[a-z]{2}$/.test(editionCode) ? editionCode : chrome.locale);
 
   function openPrefs() {
-    setCookieDraft(chrome.consent === "unknown" ? { translation: false, audience: false } : chrome.consent);
+    setCookieDraft(chrome.consent === "unknown" ? { translation: false, audience: false, memory: false } : chrome.consent);
     setPrefsOpen(true);
   }
 
@@ -397,11 +422,7 @@ export function Shell({ children, editions = [], currentPath }: { children: Reac
       <header className="site-header">
         <div className="site-header-inner">
           <Link to="/" className="brand" aria-label="Calculadoras de Enfermagem">
-            <img src={brandLogo.file.replace(/^public/, "")} alt="" width={48} height={48} />
-            <span className="brand-name">
-              Calculadoras
-              <small>de Enfermagem</small>
-            </span>
+            <img src={brandLogo.file.replace(/^public/, "")} alt="" width={72} height={48} />
           </Link>
           <SiteNav />
           <button
@@ -485,15 +506,15 @@ export function Shell({ children, editions = [], currentPath }: { children: Reac
       </footer>
 
       {chrome.consent === "unknown" && !prefsOpen ? (
-        <div className="cookie-banner" role="dialog" aria-labelledby="cookie-title">
+        <div className="cookie-banner" role="dialog" aria-labelledby="cookie-title" ref={cookieBannerRef}>
           <div>
             <p id="cookie-title">{chrome.t("cookie")}</p>
           </div>
           <div className="cookie-actions">
-            <button type="button" onClick={() => chrome.setConsent({ translation: true, audience: true })}>
+            <button type="button" onClick={() => chrome.setConsent({ translation: true, audience: true, memory: true })}>
               {chrome.t("accept")}
             </button>
-            <button type="button" className="secondary" onClick={() => chrome.setConsent({ translation: false, audience: false })}>
+            <button type="button" className="secondary" onClick={() => chrome.setConsent({ translation: false, audience: false, memory: false })}>
               {chrome.t("reject")}
             </button>
             <button type="button" className="secondary" onClick={openPrefs}>
@@ -510,30 +531,23 @@ export function Shell({ children, editions = [], currentPath }: { children: Reac
             role="dialog"
             aria-modal="true"
             aria-labelledby="cookie-prefs-title"
+            ref={cookieDialogRef}
             onClick={(event) => event.stopPropagation()}
           >
             <h2 id="cookie-prefs-title">{chrome.t("cookiesManage")}</h2>
             <p>{chrome.t("cookieNecessary")}</p>
             <fieldset className="cookie-choices">
-              <label>
-                <input type="checkbox" checked disabled /> {chrome.t("cookieNecessary").split(".")[0]}
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={cookieDraft.translation}
-                  onChange={(event) => setCookieDraft({ ...cookieDraft, translation: event.target.checked })}
-                />
-                {chrome.t("cookieTranslation")}
-              </label>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={cookieDraft.audience}
-                  onChange={(event) => setCookieDraft({ ...cookieDraft, audience: event.target.checked })}
-                />
-                {chrome.t("cookieAudience")}
-              </label>
+              {cookieCategories.map((category) => (
+                <label key={category.id}>
+                  <input
+                    type="checkbox"
+                    checked={category.id === "necessary" ? true : cookieDraft[category.id]}
+                    disabled={category.id === "necessary"}
+                    onChange={category.id === "necessary" ? undefined : (event) => setCookieDraft({ ...cookieDraft, [category.id]: event.target.checked })}
+                  />
+                  {category.id === "necessary" ? chrome.t(category.labelKey).split(".")[0] : chrome.t(category.labelKey)}
+                </label>
+              ))}
             </fieldset>
             <div className="cookie-actions">
               <button type="button" onClick={() => { chrome.setConsent(cookieDraft); setPrefsOpen(false); }}>

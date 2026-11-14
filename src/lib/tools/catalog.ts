@@ -71,7 +71,7 @@ const braden: ClinicalTool = {
       help: "Atrito da pele contra a superfície.",
       choices: [
         { value: 1, label: "Problema" },
-        { value: 2, label: "Problema em potencial" },
+        { value: 2, label: "Problema potencial" },
         { value: 3, label: "Nenhum problema aparente" },
       ],
     },
@@ -90,7 +90,7 @@ const braden: ClinicalTool = {
   ],
   faqs: [
     { q: "Um escore alto é melhor?", a: "Sim. Na Braden, quanto maior o escore, menor o risco." },
-    { q: "Posso calcular com um critério faltando?", a: "Não. O template só mostra o escore quando os seis fatores estão preenchidos." },
+    { q: "Posso calcular com um critério faltando?", a: "Não. A escala só mostra o escore quando os seis fatores estão preenchidos." },
   ],
   references: [
     "Braden B, Bergstrom N. A conceptual schema for the study of the etiology of pressure sores. Rehabilitation Nursing. 1987;12(1):8-12.",
@@ -139,7 +139,7 @@ const apgar: ClinicalTool = {
   kind: "escala",
   category: "Neonatologia",
   title: "Escala de Apgar",
-  lead: "Avalia o recém-nascido no 1º e no 5º minuto. Cada sinal vale 0, 1 ou 2. O total vai de 0 a 10.",
+  lead: "Avalia o recém-nascido no minuto escolhido: 1º, 5º ou 10º. Cada sinal vale 0, 1 ou 2. O total vai de 0 a 10.",
   nandaMode: "sugerir",
   metaFields: [
     { id: "momento", label: "Momento", options: [{ value: "1", label: "1º minuto" }, { value: "5", label: "5º minuto" }, { value: "10", label: "10º minuto" }] },
@@ -153,7 +153,7 @@ const apgar: ClinicalTool = {
   ],
   bands: [
     { min: 0, max: 3, label: "Depressão grave", tone: "danger", note: "Sinal de alerta. Siga o protocolo de reanimação neonatal da instituição.", nanda: ["Troca de gases prejudicada", "Padrão respiratório ineficaz"] },
-    { min: 4, max: 6, label: "Depressão moderada", tone: "warn", note: "Necessita apoio e reavaliação no próximo minuto previsto.", nanda: ["Padrão respiratório ineficaz"] },
+    { min: 4, max: 6, label: "Depressão moderada", tone: "warn", note: "O recém-nascido precisa de apoio e de nova avaliação no próximo minuto previsto.", nanda: ["Padrão respiratório ineficaz"] },
     { min: 7, max: 10, label: "Boa vitalidade", tone: "ok", note: "Boa adaptação neste momento. Mantenha a observação de rotina.", nanda: [] },
   ],
   howTo: [
@@ -163,7 +163,7 @@ const apgar: ClinicalTool = {
   ],
   faqs: [
     { q: "O Apgar decide sozinho a reanimação?", a: "Não. Ele descreve a condição. A conduta segue o protocolo neonatal e a equipe presente." },
-    { q: "Por que o momento fica separado do escore?", a: "1º, 5º e 10º minuto são registros diferentes. O template não mistura esses valores." },
+    { q: "Por que o momento fica separado do escore?", a: "1º, 5º e 10º minuto são registros diferentes. A página não mistura esses valores." },
   ],
   references: [
     "Apgar V. A proposal for a new method of evaluation of the newborn infant. Curr Res Anesth Analg. 1953;32(4):260-267.",
@@ -191,9 +191,9 @@ const gotejamento: ClinicalTool = {
     { id: "gotas", label: "Gotejamento", unit: "gotas/min", digits: 0 },
   ],
   howTo: [
-    "Informe o volume prescrito e o tempo de infusão.",
+    "Informe o volume prescrito e o tempo de infusão, em horas e minutos.",
     "Escolha o equipo que está na bancada. Macrogotas usa fator 20. Microgotas usa fator 60.",
-    "Gotas por minuto = (volume × fator) ÷ minutos. mL/hora = volume ÷ horas.",
+    "Some o tempo em minutos. Gotas por minuto = (volume × fator) ÷ tempo em minutos. mL/hora = volume ÷ tempo em horas.",
   ],
   faqs: [
     { q: "Posso trocar macro por micro sem recalcular?", a: "Não. O fator muda o número de gotas. Recalcule depois de trocar o equipo." },
@@ -232,7 +232,7 @@ const imc: ClinicalTool = {
     "Não use estes cortes em criança, gestante ou idoso sem a referência própria.",
   ],
   faqs: [
-    { q: "O IMC fecha um diagnóstico de enfermagem?", a: "Não. Ele descreve a relação peso-altura. O template não sugere NANDA a partir só deste número." },
+    { q: "O IMC fecha um diagnóstico de enfermagem?", a: "Não. Ele descreve a relação entre peso e altura. Este cálculo não sugere diagnóstico de enfermagem a partir só deste número." },
     { q: "E se a altura estiver em metros?", a: "Converta para centímetros. 1,70 m = 170 cm." },
   ],
   references: [
@@ -276,13 +276,13 @@ const aldrete: ClinicalTool = {
   ],
   publicacao: "candidata",
   holds: [
-    "UTC-003/UTC-071: externalizar toda verdade clinica do source da pagina para binding governado em runtime",
-    "UTC-004: reconciliar identidade tecnica UUIDv5 legado com UUIDv7, sem duplicidade",
-    "UTC-051: provar a derivacao de canonical/hreflang a partir do Route Registry em build/runtime",
-    "UTC-053/UTC-056: recuperar dimensoes intrinsecas da imagem OG e perfil completo de direitos/hash",
+    "UTC-003/UTC-071: externalizar toda verdade clínica da página-fonte para o vínculo governado em tempo de execução",
+    "UTC-004: reconciliar identidade técnica UUIDv5 legado com UUIDv7, sem duplicidade",
+    "UTC-051: provar a derivação de canonical/hreflang a partir do Route Registry em build/runtime",
+    "UTC-053/UTC-056: recuperar dimensões intrínsecas da imagem OG e perfil completo de direitos/hash",
     "UTC-072: E2E de browser",
-    "UTC-080/081/082: verificador de ABNT/citacao/pinpoint",
-    "UTC-097: decisao sobre aplicabilidade do disclaimer de emergencia",
+    "UTC-080/081/082: verificador de ABNT/citação/pinpoint",
+    "UTC-097: decisão sobre aplicabilidade do aviso de emergência",
   ],
   sourceIds: ["SRC-CFM-PARECER-28-2020"],
   related: ["braden", "morse", "apgar"],

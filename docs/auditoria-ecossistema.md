@@ -9,8 +9,6 @@ Falha o teste. Não pode ir ao ar.
 | Id | Norma interna | O que impede |
 |---|---|---|
 | PUB-CORPO | Política de dado | Texto publicado com corpo vazio |
-| CLI-CAPA | Capa do instrumento | Cálculo aberto fora de Apgar, Braden, gotejamento, IMC e Morse |
-| CLI-FORMULA | Fórmula | Capa publicada sem fórmula, critério ou campo |
 | KER-PESSOA | Admissão | Aprovador com o valor `kernel` |
 | LGPD-PACIENTE | Política de dado | Coluna de paciente, leito, prontuário ou CPF |
 
@@ -22,7 +20,7 @@ O teste exige que um achado só permaneça enquanto a causa existir. Os dois de 
 |---|---|---|
 | I18N-CHROME | Rótulo da interface | Português sem par em inglês, espanhol ou francês. Hoje não dispara. |
 
-A aprovação de 1º de novembro de 2026 publicou o texto que já tinha corpo, o texto alternativo e marcou regra, política e especificação como aprovadas por `administrador`. Quinze textos em português seguem em rascunho porque o corpo está vazio. As 77 capas sem fórmula não foram publicadas. Arquivo de outro repositório sem corpo continua na fila.
+A aprovação de 1º de novembro de 2026 publicou o texto que já tinha corpo, o texto alternativo e marcou regra, política e especificação como aprovadas por `administrador`. O ambiente de teste depois abriu o restante do texto com corpo e as capas das ferramentas. Isso não homologa fórmula. Corpo vazio, modelo canônico e ficha de norma sem texto seguem em rascunho. Texto alternativo em outro idioma e regra de negócio também.
 | DIC-ENTIDADE-SEM-TABELA | Dicionário interno, não ISO 8000 | Entidade sem tabela. Hoje não dispara. |
 | DIC-TABELA-SEM-ENTIDADE | Dicionário interno | Tabela sem entidade. Hoje não dispara. |
 

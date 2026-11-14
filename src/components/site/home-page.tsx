@@ -90,7 +90,7 @@ function SectionBand({
         </div>
         <div className="ico-circle" aria-hidden="true">
           <img
-            src={icon === "book" ? icons.book : icon === "cross" ? "/brand/logo.webp" : icons.calc}
+            src={icon === "book" ? icons.book : icon === "cross" ? "/brand/logo.svg" : icons.calc}
             alt=""
             width={28}
             height={28}

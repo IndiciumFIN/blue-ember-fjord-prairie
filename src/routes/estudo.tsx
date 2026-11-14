@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ArticlePage } from "@/components/article/article-page";
 import { Shell } from "@/components/site/shell";
-import { PageHero } from "@/components/site/page-hero";
 import { BookOpenIcon, LayersIcon, FileTextIcon, DownloadIcon, UploadIcon, HistoryIcon, TrashIcon } from "lucide-react";
 import { QuizzesPanel } from "@/components/education/quizzes-panel";
 import { FlashcardsPanel } from "@/components/education/flashcards-panel";
@@ -87,12 +87,13 @@ function EstudoPage() {
 
   return (
     <Shell>
-      <main id="conteudo" className="page-wide">
-        <PageHero
-          eyebrow="Ferramentas Educacionais"
-          title="Plataforma de Estudo"
-          lead="Crie quizzes com cronômetro, flashcards com repetição espaçada e simulados para concursos. Cada questão pode vincular-se a uma escala clínica do site. Os dados são salvos localmente no seu navegador."
-        />
+      <ArticlePage
+        kind="editorial"
+        crumbs={[{ label: "Início", to: "/" }, { label: "Estudo" }]}
+        eyebrow="Ferramentas Educacionais"
+        title="Plataforma de Estudo"
+        lead="Crie quizzes com cronômetro, flashcards com repetição espaçada e simulados para concursos. Cada questão pode vincular-se a uma escala clínica do site. Os dados são salvos localmente no seu navegador."
+      >
 
         <section className="ce-admin-panel" style={{ marginTop: "1.5rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem", flexWrap: "wrap" }}>
@@ -169,7 +170,7 @@ function EstudoPage() {
           {tab === "simulados" && <SimuladosPanel />}
           {tab === "historico" && <HistoricoPanel onClear={clearHistory} />}
         </section>
-      </main>
+      </ArticlePage>
     </Shell>
   );
 }

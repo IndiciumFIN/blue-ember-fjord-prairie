@@ -7,7 +7,7 @@ import { auditPlatformConclusion } from "./platform-conclusion.ts";
 test("o registro local vira identificador, sem contabilidade e sem cláusula", async () => {
   const registry = JSON.parse(await readFile(new URL("../../../attachments/CKO_Fontes_Normativas_Registry.json", import.meta.url), "utf8"));
   const accounting = /contabil|contábil|accounting|\bcfc\b|nbc ta|nbc ti|nbc pg/i;
-  const expected = registry.sources.filter((source) => !accounting.test([source.code, source.title, source.issuer].join(" "))).length;
+  const expected = registry.sources.filter((source: { code: string; title: string; issuer: string }) => !accounting.test([source.code, source.title, source.issuer].join(" "))).length;
   const db = new PGlite();
   const base = new URL("../../../migrations/", import.meta.url);
   const names = (await readdir(base)).filter((name) => name.endsWith(".sql")).sort();

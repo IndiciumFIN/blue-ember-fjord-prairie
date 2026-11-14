@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ArticlePage } from "@/components/article/article-page";
 import { Shell } from "@/components/site/shell";
-import { PageHero } from "@/components/site/page-hero";
 import { SearchIcon, ImageIcon, XIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import {
   ALBUM_ITEMS_SEED,
@@ -60,12 +60,13 @@ function AlbumPage() {
 
   return (
     <Shell>
-      <main id="conteudo" className="page-wide">
-        <PageHero
-          eyebrow="Editorial · Álbum visual"
-          title="Álbum de Enfermagem"
-          lead={`${ALBUM_TOTAL} imagens curadas: retratos históricos, equipamentos, procedimentos e momentos da profissão.`}
-        />
+      <ArticlePage
+        kind="biblioteca"
+        crumbs={[{ label: "Início", to: "/" }, { label: "Álbum" }]}
+        eyebrow="Editorial · Álbum visual"
+        title="Álbum de Enfermagem"
+        lead={`${ALBUM_TOTAL} imagens curadas: retratos históricos, equipamentos, procedimentos e momentos da profissão.`}
+      >
 
         <section style={{ marginTop: "1.5rem" }}>
           {/* Filtros */}
@@ -168,7 +169,7 @@ function AlbumPage() {
             <strong>Direitos de imagem:</strong> Todas as imagens são provenientes de fontes com licenças compatíveis (domínio público para obras históricas, Creative Commons para contemporâneas). Cada item declara sua licença e fonte de origem. Para uso editorial, verifique a licença específica.
           </div>
         </section>
-      </main>
+      </ArticlePage>
     </Shell>
   );
 }

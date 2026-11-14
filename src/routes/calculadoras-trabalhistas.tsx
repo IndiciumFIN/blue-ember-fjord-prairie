@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ArticlePage } from "@/components/article/article-page";
 import { Shell } from "@/components/site/shell";
-import { PageHero } from "@/components/site/page-hero";
 import { Link } from "@tanstack/react-router";
 import { CalculatorIcon, ArrowRightIcon } from "lucide-react";
 
@@ -56,12 +56,13 @@ function CalculadorasTrabalhistasPage() {
 
   return (
     <Shell>
-      <main id="conteudo" className="page-wide">
-        <PageHero
-          eyebrow="Ferramentas trabalhistas · Enfermagem"
-          title="Calculadoras Trabalhistas"
-          lead="Centro de calculadoras trabalhistas para profissionais de enfermagem. Apura férias, adicional noturno, horas extras e verbas rescisórias com base legal explícita (CLT, CF/88, Lei 11.901/2009)."
-        />
+      <ArticlePage
+        kind="ferramenta"
+        crumbs={[{ label: "Início", to: "/" }, { label: "Calculadoras trabalhistas" }]}
+        eyebrow="Ferramentas trabalhistas · Enfermagem"
+        title="Calculadoras Trabalhistas"
+        lead="Centro de calculadoras trabalhistas para profissionais de enfermagem. Apura férias, adicional noturno, horas extras e verbas rescisórias com base legal explícita (CLT, CF/88, Lei 11.901/2009)."
+      >
 
         <section style={{ marginTop: "1.5rem" }}>
           {!selected ? (
@@ -100,7 +101,7 @@ function CalculadorasTrabalhistasPage() {
             <strong>Atenção:</strong> As calculadoras trabalhistas são ferramentas de apoio. Os cálculos podem variar conforme acordos coletivos, convenções específicas de enfermagem (Lei 11.901/2009) e atualizações legislativas. Consulte sempre um advogado trabalhista ou o sindicato da categoria para decisão final.
           </div>
         </section>
-      </main>
+      </ArticlePage>
     </Shell>
   );
 }

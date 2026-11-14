@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { enforceConsent, parseConsent, serializeConsent, type Consent } from "@/lib/cookie-banner";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import { parseLocale } from "@/lib/translate";
 import { useStored } from "@/lib/stored";
@@ -6,8 +7,7 @@ import { useStored } from "@/lib/stored";
 export type Locale = "pt-BR" | "en" | "es" | "fr";
 export type FontStep = "sm" | "md" | "lg";
 export type FocusColor = "yellow" | "lime" | "cyan" | "magenta";
-export type OptionalConsent = { translation: boolean; audience: boolean };
-export type Consent = "unknown" | OptionalConsent;
+export type { Consent, OptionalConsent } from "@/lib/cookie-banner";
 export type ThemeMode = "light" | "dark";
 
 type ChromeState = {
@@ -71,6 +71,7 @@ const copy = {
     cookieNecessary: "Necessários ficam sempre ligados: acessibilidade e o registro desta escolha. A calculadora não depende deles.",
     cookieTranslation: "Tradução automática (MyMemory)",
     cookieAudience: "Medir desempenho desta visita, só neste navegador",
+    cookieMemory: "Lembrar rascunhos deste navegador: fórum, SBAR, estudo, pesquisa e currículo",
     autoNote: "A interface segue o idioma da URL. Textos institucionais usam tradução automática da MyMemory. Escalas e calculadoras permanecem em português.",
     clinicalLock: "Este instrumento permanece em português. Critérios e pontuação não passam por tradução automática.",
     searchPlaceholder: "Buscar calculadoras, escalas e seções",
@@ -122,6 +123,7 @@ const copy = {
     cookieNecessary: "Necessary cookies stay on: accessibility and this choice. The calculator does not depend on the optional ones.",
     cookieTranslation: "Automatic translation (MyMemory)",
     cookieAudience: "Measure performance for this visit, only in this browser",
+    cookieMemory: "Remember drafts in this browser: forum, SBAR, study, research and résumé",
     autoNote: "The interface follows the language in the URL. Institutional text uses MyMemory automatic translation. Scales and calculators stay in Portuguese.",
     clinicalLock: "This instrument stays in Portuguese. Criteria and scores are not machine-translated.",
     searchPlaceholder: "Search calculators, scales and sections",
@@ -173,6 +175,7 @@ const copy = {
     cookieNecessary: "Los necesarios siguen activos: accesibilidad y esta elección. La calculadora no depende de los opcionales.",
     cookieTranslation: "Traducción automática (MyMemory)",
     cookieAudience: "Medir el rendimiento de esta visita, solo en este navegador",
+    cookieMemory: "Recordar borradores en este navegador: foro, SBAR, estudio, investigación y currículum",
     autoNote: "La interfaz sigue el idioma de la URL. Los textos institucionales usan traducción automática de MyMemory. Las escalas y calculadoras permanecen en portugués.",
     clinicalLock: "Este instrumento permanece en portugués. Los criterios y la puntuación no se traducen automáticamente.",
     searchPlaceholder: "Buscar calculadoras, escalas y secciones",
@@ -224,6 +227,7 @@ const copy = {
     cookieNecessary: "Les cookies nécessaires restent actifs : accessibilité et ce choix. La calculatrice n'en dépend pas.",
     cookieTranslation: "Traduction automatique (MyMemory)",
     cookieAudience: "Mesurer les performances de cette visite, seulement dans ce navigateur",
+    cookieMemory: "Mémoriser les brouillons de ce navigateur : forum, SBAR, étude, recherche et curriculum",
     autoNote: "L'interface suit la langue de l'URL. Les textes institutionnels utilisent la traduction automatique MyMemory. Les échelles et calculatrices restent en portugais.",
     clinicalLock: "Cet instrument reste en portugais. Les critères et le score ne sont pas traduits automatiquement.",
     searchPlaceholder: "Rechercher calculatrices, échelles et sections",
@@ -275,18 +279,9 @@ export function ChromeProvider({ children }: { children: ReactNode }) {
     }
     setDyslexiaState(storedDyslexia === "1");
     if (storedTheme === "dark" || storedTheme === "light") setThemeState(storedTheme);
-    if (storedConsent === "accepted") setConsentState({ translation: true, audience: true });
-    else if (storedConsent === "rejected") setConsentState({ translation: false, audience: false });
-    else if (storedConsent) {
-      try {
-        const parsed = JSON.parse(storedConsent) as Partial<OptionalConsent>;
-        if (typeof parsed.translation === "boolean" && typeof parsed.audience === "boolean") {
-          setConsentState({ translation: parsed.translation, audience: parsed.audience });
-        }
-      } catch {
-        /* ignore a broken preference */
-      }
-    }
+    const restored = parseConsent(storedConsent);
+    setConsentState(restored);
+    enforceConsent(restored);
     const fromUrl = parseLocale(new URLSearchParams(window.location.search).get("lang"));
     const top = window.location.pathname.replace(/^\//, "").split("/")[0];
     const fromPath = top === "en" || top === "es" || top === "fr" ? top : undefined;
@@ -319,7 +314,8 @@ export function ChromeProvider({ children }: { children: ReactNode }) {
     root.dataset.focus = focus;
     root.dataset.dyslexia = dyslexia ? "on" : "off";
     root.dataset.theme = theme;
-  }, [locale, font, contrast, focus, dyslexia, theme]);
+    enforceConsent(consent);
+  }, [locale, font, contrast, focus, dyslexia, theme, consent]);
 
   const value = useMemo<ChromeState>(() => {
     const setLocale = (next: Locale) => {
@@ -359,8 +355,10 @@ export function ChromeProvider({ children }: { children: ReactNode }) {
     };
     const setConsent = (next: Consent) => {
       setConsentState(next);
-      if (next === "unknown") localStorage.removeItem("cde-consent");
-      else localStorage.setItem("cde-consent", JSON.stringify(next));
+      const saved = serializeConsent(next);
+      if (saved === null) localStorage.removeItem("cde-consent");
+      else localStorage.setItem("cde-consent", saved);
+      enforceConsent(next);
     };
     return {
       locale,

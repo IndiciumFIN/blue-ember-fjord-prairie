@@ -1,7 +1,8 @@
 import {useEffect,useMemo,useState,type Dispatch,type FormEvent,type ReactNode,type SetStateAction} from "react";
 import {Breadcrumb} from "@/components/site/breadcrumb";
 import {Callout} from "@/components/site/callout";
-import {PageHero} from "@/components/site/page-hero";
+import { PageHero } from "@/components/page-hero";
+import {allows} from "@/lib/cookie-banner";
 import {addCareerApplication,addCareerMilestone,getCareerSnapshot,saveCareerProfile,saveCareerSkill,setCareerCredential,updateCareerApplication,type CareerAudience,type CareerSnapshot} from "@/lib/career.functions";
 import "@/styles/career.css";
 
@@ -9,7 +10,7 @@ const stageLabels:Record<string,string>={EXPLORING:"Explorando",STUDENT:"Estudan
 const appStageLabels:Record<string,string>={SAVED:"Salva",APPLIED:"Candidatura enviada",INTERVIEW:"Entrevista",TECHNICAL_STAGE:"Etapa técnica",OFFER:"Proposta",APPROVED:"Aprovado",DECLINED:"Encerrado/recusado",CLOSED:"Fechado"};
 const credentialLabels:Record<string,string>={PLANNED:"Planejada",IN_PROGRESS:"Em andamento",COMPLETED:"Concluída",RENEWAL_REVIEW:"Revisar renovação"};
 
-function participantKey(){if(typeof window==="undefined")return"";const k="ce.career.participant.v1";let v=localStorage.getItem(k);if(!v){v=`anon-${crypto.randomUUID()}`;localStorage.setItem(k,v)}return v}
+function participantKey(){if(typeof window==="undefined")return"";const k="ce.career.participant.v1";let v=localStorage.getItem(k);if(!v){v=`anon-${crypto.randomUUID()}`;if(allows("memory"))localStorage.setItem(k,v)}return v}
 function Field({label,children}:{label:string;children:ReactNode}){return <label className="ce-career-field"><span>{label}</span>{children}</label>}
 function Stat({value,label,note}:{value:string|number;label:string;note:string}){return <article className="ce-career-card ce-career-stat"><strong>{value}</strong><h3>{label}</h3><span>{note}</span></article>}
 

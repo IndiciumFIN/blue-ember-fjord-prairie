@@ -18,7 +18,8 @@ test("objeto inválido dentro do array não entra", () => {
   const issues = catalogListIssues(broken);
   assert.equal(issues[0]?.path, "criteria.0.choices.1.value");
   assert.equal(issues[0]?.message, "O campo precisa ser número.");
-  broken.criteria![0].choices[1] = "texto" as unknown as typeof broken.criteria[0]["choices"][1];
+  const first = broken.criteria![0];
+  broken.criteria![0].choices[1] = "texto" as unknown as (typeof first)["choices"][number];
   assert.equal(catalogListIssues(broken)[0]?.message, "O campo precisa ser objeto.");
   broken.criteria![0].choices[1] = { value: 2, label: "Muito limitada" };
   broken.bands![0].nanda = [12 as unknown as string];

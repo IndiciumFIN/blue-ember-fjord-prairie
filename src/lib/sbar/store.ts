@@ -2,7 +2,8 @@
  * Store client-side para o bloco SBAR.
  * Mesmo padrão dos outros blocos (research, career, education).
  */
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { allows } from "@/lib/cookie-banner";
 import type { SbarHandoff } from "./types";
 
 const STORAGE_KEY = "ce-sbar/handoffs.v1";
@@ -19,7 +20,7 @@ function readJSON<T>(key: string, fallback: T): T {
   }
 }
 function writeJSON<T>(key: string, value: T): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !allows("memory")) return;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
     window.dispatchEvent(new CustomEvent("ce-sbar:change", { detail: { key } }));

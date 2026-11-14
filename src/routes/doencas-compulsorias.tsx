@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ArticlePage } from "@/components/article/article-page";
 import { Shell } from "@/components/site/shell";
-import { PageHero } from "@/components/site/page-hero";
 import { SearchIcon, AlertTriangleIcon, ChevronDownIcon, ChevronRightIcon, ClockIcon } from "lucide-react";
 import {
   DOENCAS_COMPULSORIAS,
@@ -72,12 +72,13 @@ function DoencasPage() {
 
   return (
     <Shell>
-      <main id="conteudo" className="page-wide">
-        <PageHero
-          eyebrow="Saúde Pública · Vigilância Epidemiológica"
-          title="Doenças de Notificação Compulsória"
-          lead="Lista oficial conforme Portaria MS/GM nº 3.220/2024. Agrupada por prazo de notificação (imediata/semanal/mensal) com medidas de controle para cada agravo."
-        />
+      <ArticlePage
+        kind="secao"
+        crumbs={[{ label: "Início", to: "/" }, { label: "Doenças de notificação compulsória" }]}
+        eyebrow="Saúde Pública · Vigilância Epidemiológica"
+        title="Doenças de Notificação Compulsória"
+        lead="Lista oficial conforme Portaria MS/GM nº 3.220/2024. Agrupada por prazo de notificação (imediata/semanal/mensal) com medidas de controle para cada agravo."
+      >
 
         <section style={{ marginTop: "1.5rem" }}>
           {/* Cards por grupo */}
@@ -196,7 +197,7 @@ function DoencasPage() {
             <strong>Aviso:</strong> Esta lista deve ser revisada anualmente conforme atualizações do Ministério da Saúde. Confira sempre a versão vigente da Portaria antes de decisão clínica.
           </div>
         </section>
-      </main>
+      </ArticlePage>
     </Shell>
   );
 }

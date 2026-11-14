@@ -272,13 +272,13 @@
       "status": "CANDIDATE",
       "publicacao": "candidata",
       "holds": [
-        "UTC-003/UTC-071: externalizar toda verdade clinica do source da pagina para binding governado em runtime",
-        "UTC-004: reconciliar identidade tecnica UUIDv5 legado com UUIDv7, sem duplicidade",
-        "UTC-051: provar a derivacao de canonical/hreflang a partir do Route Registry em build/runtime",
-        "UTC-053/UTC-056: recuperar dimensoes intrinsecas da imagem OG e perfil completo de direitos/hash",
+        "UTC-003/UTC-071: externalizar toda verdade clínica da página-fonte para o vínculo governado em tempo de execução",
+        "UTC-004: reconciliar identidade técnica UUIDv5 legado com UUIDv7, sem duplicidade",
+        "UTC-051: provar a derivação de canonical/hreflang a partir do Route Registry em build/runtime",
+        "UTC-053/UTC-056: recuperar dimensões intrínsecas da imagem OG e perfil completo de direitos/hash",
         "UTC-072: E2E de browser",
-        "UTC-080/081/082: verificador de ABNT/citacao/pinpoint",
-        "UTC-097: decisao sobre aplicabilidade do disclaimer de emergencia"
+        "UTC-080/081/082: verificador de ABNT/citação/pinpoint",
+        "UTC-097: decisão sobre aplicabilidade do aviso de emergência"
       ],
       "source_ids": [
         "SRC-CFM-PARECER-28-2020"

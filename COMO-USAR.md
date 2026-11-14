@@ -67,7 +67,7 @@ Refs: UTC-024, UTC-028, UTC-053, UTC-056
 ## Regras que não se negociam
 
 - **Login e assinatura continuam desligados.** `VITE_AUTH_ENABLED=false`. Não religar sem autorização explícita.
-- **O banco está desligado.** `DB_ENABLED` é `false as const` e `getSql()`/`getPglite()` rejeitam de propósito.
+- **O banco local está ligado.** Sem `DATABASE_URL`, o runtime abre o PostgreSQL embutido e aplica `migrations/`. O remoto não abre sozinho. Documentos antigos que ainda dizem `DB_ENABLED = false` descrevem o backup público, não este runtime.
 - **Conteúdo clínico não se inventa.** Se não tem fonte declarada, fica como candidata fora do índice.
 - **A Aldrete é candidata.** Sete HOLDs, fora do sitemap, com `noindex`.
 - **`md_gate` está fechado.** Nada vai a `RELEASED` até ele abrir.

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { ArticlePage } from "@/components/article/article-page";
 import { Shell } from "@/components/site/shell";
-import { PageHero } from "@/components/site/page-hero";
 import { SearchIcon, AlertTriangleIcon, CheckCircleIcon, ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { examesData, type Exame } from "@/lib/tools/exames-laboratoriais.data";
 
@@ -80,12 +80,13 @@ function ExamesPage() {
 
   return (
     <Shell>
-      <main id="conteudo" className="page-wide">
-        <PageHero
-          eyebrow="Catálogo clínico"
-          title="Exames Laboratoriais"
-          lead="149 exames laboratoriais em 21 categorias, com faixas de referência por sexo e interpretador automático. Digite o valor do paciente para ver se está baixo, normal ou alto."
-        />
+      <ArticlePage
+        kind="ferramenta"
+        crumbs={[{ label: "Início", to: "/" }, { label: "Exames laboratoriais" }]}
+        eyebrow="Catálogo clínico"
+        title="Exames Laboratoriais"
+        lead="149 exames laboratoriais em 21 categorias, com faixas de referência por sexo e interpretador automático. Digite o valor do paciente para ver se está baixo, normal ou alto."
+      >
 
         <section style={{ marginTop: "1.5rem" }}>
           {/* Barra de busca e filtro */}
@@ -214,7 +215,7 @@ function ExamesPage() {
             <strong>Aviso:</strong> As faixas de referência podem variar conforme o laboratório e o método utilizado. Consulte sempre a referência fornecida pelo laboratório que realizou o exame. Este interpretador é ferramenta de apoio didático e não substitui avaliação clínica.
           </div>
         </section>
-      </main>
+      </ArticlePage>
     </Shell>
   );
 }
