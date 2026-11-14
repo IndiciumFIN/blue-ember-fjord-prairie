@@ -5,7 +5,7 @@ import { Shell } from "@/components/site/shell";
 export const Route = createFileRoute("/cursos-sus")({
   head: () => ({ meta: [
     { title: "Cursos SUS · Calculadoras de Enfermagem" },
-    { name: "robots", content: "index, follow" },
+    { name: "robots", content: "noindex, nofollow" },
   ] }),
   component: () => (
     <Shell>
