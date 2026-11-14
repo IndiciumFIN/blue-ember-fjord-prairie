@@ -1,0 +1,89 @@
+name: CE | Deterministic Supabase to Skeleton Agents
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - canonical/supabase-skeleton-20261101
+    paths:
+      - 'scripts/ce-agents/**'
+      - 'registers/pmo/queue.v1.json'
+      - '.github/workflows/ce-canonical-deterministic-agents.yml'
+permissions:
+  contents: write
+concurrency:
+  group: ce-candidate-serialized-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  deterministic-agents:
+    if: github.ref == 'refs/heads/canonical/supabase-skeleton-20261101'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Get exact candidate SHA and all source branches
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Fetch all branch refs for read-only reconciliation
+        run: git fetch origin '+refs/heads/*:refs/remotes/origin/*' --prune
+      - name: Node runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Capture catalog metadata when secret is configured
+        env:
+          CE_DB_READONLY_URL: ${{ secrets.CE_DB_READONLY_URL }}
+        shell: bash
+        run: |
+          if [[ -n "$CE_DB_READONLY_URL" ]]; then
+            node scripts/ce-agents/run.mjs capture
+          else
+            echo 'HOLD_HUMAN: read-only Supabase credential not configured; using existing candidate snapshots'
+          fi
+      - name: Independent 1NF→5NF candidate precheck (not compliance certificate)
+        run: node scripts/ce-agents/audit-normal-forms.mjs
+      - name: Reconstruct skeleton, reconcile branches, check and audit
+        id: agent_pipeline
+        continue-on-error: true
+        env:
+          CE_DB_READONLY_URL: ''
+        run: node scripts/ce-agents/run.mjs pipeline
+      - name: Archive complete agent evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ce-supabase-skeleton-evidence
+          path: artifacts/ce-agents/
+          if-no-files-found: warn
+      - name: Version complete metadata on candidate branch only
+        if: steps.agent_pipeline.outcome == 'success'
+        shell: bash
+        run: |
+          test "$GITHUB_REF" = 'refs/heads/canonical/supabase-skeleton-20261101'
+          test -f artifacts/ce-agents/skeleton/index.json
+          mkdir -p registers/canonical/supabase-skeleton/20261101
+          mkdir -p audit-evidence/supabase-canonical/20261101/validation
+          cp -R artifacts/ce-agents/skeleton/. registers/canonical/supabase-skeleton/20261101/
+          cp artifacts/ce-agents/checker.json artifacts/ce-agents/audit.json artifacts/ce-agents/run-summary.json artifacts/ce-agents/relational-normal-forms-precheck.json audit-evidence/supabase-canonical/20261101/validation/
+          git add audit-evidence/supabase-canonical/20261101/schemas/ audit-evidence/supabase-canonical/20261101/validation/ registers/canonical/supabase-skeleton/20261101/
+          if ! git diff --cached --quiet; then
+            git config user.name 'CE Deterministic Catalog Agent'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'chore(db): materialize 45-schema canonical skeleton candidate [WO-CE-DB-SKELETON-001]'
+            for attempt in 1 2 3; do
+              git fetch origin canonical/supabase-skeleton-20261101
+              git rebase origin/canonical/supabase-skeleton-20261101
+              if git push origin HEAD:canonical/supabase-skeleton-20261101; then
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then echo 'HOLD_HUMAN: concurrent branch update'; exit 2; fi
+            done
+          fi
+      - name: Fail closed until full baseline is validated
+        if: steps.agent_pipeline.outcome != 'success'
+        run: |
+          echo 'HOLD_HUMAN: incomplete structural baseline. No promotion, merge, database writes or content ingestion.'
+          exit 2

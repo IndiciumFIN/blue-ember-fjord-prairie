@@ -1,0 +1,221 @@
+name: CE | Full Branch Audit + Supabase Local Bootstrap
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - canonical/supabase-skeleton-20261101
+    paths:
+      - 'scripts/ce-agents/branch-crosswalk.mjs'
+      - 'scripts/ce-agents/replay-local-catalog.mjs'
+      - 'scripts/ce-agents/replay-local-skeleton.mjs'
+      - 'scripts/ce-agents/replay-local-physical-ddl.mjs'
+      - 'scripts/ce-agents/verify-physical-ddl-local.mjs'
+      - 'scripts/ce-agents/verify-full-ddl-local.mjs'
+      - 'audit-evidence/mof-foundation-recovery/20261102/**'
+      - 'scripts/ce-agents/audit-mof-foundation.mjs'
+      - 'scripts/ce-agents/seed-mof-reference-local.mjs'
+      - 'scripts/ce-agents/restore-normative-reference-local.mjs'
+      - 'scripts/ce-agents/restore-processes-local.mjs'
+      - 'scripts/ce-agents/restore-field-catalog-local.mjs'
+      - 'audit-evidence/mof-foundation-recovery/20261102/read-only-live-registers/**'
+      - '.github/workflows/ce-supabase-local.yml'
+permissions:
+  contents: write
+concurrency:
+  group: ce-candidate-serialized-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  branch-crosswalk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch every remote branch ref
+        run: git fetch origin '+refs/heads/*:refs/remotes/origin/*' --prune
+      - name: Full Git blob crosswalk with drift detection
+        run: node scripts/ce-agents/branch-crosswalk.mjs
+      - name: Version full immutable Git tree evidence (compressed) on candidate only
+        shell: bash
+        run: |
+          test "$GITHUB_REF" = 'refs/heads/canonical/supabase-skeleton-20261101'
+          mkdir -p audit-evidence/git-branches
+          gzip -n -9 -c artifacts/ce-agents/branch-crosswalk.json > audit-evidence/git-branches/all-branches-20261102.json.gz
+          sha256sum audit-evidence/git-branches/all-branches-20261102.json.gz > audit-evidence/git-branches/all-branches-20261102.json.gz.sha256
+          git add audit-evidence/git-branches/
+          if ! git diff --cached --quiet; then
+            git config user.name 'CE Full Git Tree Auditor'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'audit(git): persist 36-source tree crosswalk and SHA evidence [WO-CE-DB-SKELETON-001]'
+            for attempt in 1 2 3; do
+              git fetch origin canonical/supabase-skeleton-20261101
+              git rebase origin/canonical/supabase-skeleton-20261101
+              if git push origin HEAD:canonical/supabase-skeleton-20261101; then
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then echo 'HOLD_HUMAN: concurrent branch update'; exit 2; fi
+            done
+          fi
+      - name: Archive full 37-branch audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ce-all-branch-crosswalk
+          path: artifacts/ce-agents/branch-crosswalk.json
+          if-no-files-found: error
+  local-stack:
+    needs: branch-crosswalk
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.84.2
+      - name: Confirm CLI available and initialize project deterministically
+        run: |
+          supabase --version
+          if [ ! -f supabase/config.toml ]; then
+            supabase init
+          fi
+          test -f supabase/config.toml
+          if [ -d supabase/migrations ]; then
+            echo 'Existing migration directory detected; no auto-migration, reset, or linked push authorized'
+          fi
+      - name: Install locked dependencies for local catalog agent
+        run: npm ci --ignore-scripts
+      - name: Launch isolated local Supabase stack
+        run: |
+          supabase start > /tmp/ce-supabase-start.log 2>&1 || { echo 'Local stack bootstrap failed; details withheld to avoid leaking service keys'; exit 1; }
+          supabase status > /dev/null
+          supabase gen types typescript --local > /tmp/ce-local-types.ts
+          test -s /tmp/ce-local-types.ts
+      - name: Replay 45 schema snapshots to LOCAL catalog and verify 606 tables by readback
+        shell: bash
+        env:
+          CE_LOCAL_ONLY: 'YES'
+        run: |
+          CE_DB_LOCAL_URL="$(supabase status -o env | sed -n 's/^DB_URL=//p' | tr -d '"')"
+          if [ -z "$CE_DB_LOCAL_URL" ]; then
+            echo 'LOCAL_CATALOG_HOLD: missing local database URL'
+            exit 2
+          fi
+          export CE_DB_LOCAL_URL
+          node scripts/ce-agents/replay-local-catalog.mjs
+      - name: Build 562 isolated LOCAL application skeleton tables from catalog
+        shell: bash
+        env:
+          CE_LOCAL_ONLY: 'YES'
+        run: |
+          CE_DB_LOCAL_URL="$(supabase status -o env | sed -n 's/^DB_URL=//p' | tr -d '"')"
+          if [ -z "$CE_DB_LOCAL_URL" ]; then exit 2; fi
+          export CE_DB_LOCAL_URL
+          node scripts/ce-agents/replay-local-skeleton.mjs
+          node scripts/ce-agents/replay-local-physical-ddl.mjs
+          node scripts/ce-agents/verify-physical-ddl-local.mjs
+          node scripts/ce-agents/verify-full-ddl-local.mjs
+      - name: Restore and validate 12 governed CKO flow processes LOCAL ONLY
+        shell: bash
+        env:
+          CE_LOCAL_ONLY: 'YES'
+        run: |
+          CE_DB_LOCAL_URL="$(supabase status -o env | sed -n 's/^DB_URL=//p' | tr -d '"')"
+          test -n "$CE_DB_LOCAL_URL"
+          export CE_DB_LOCAL_URL
+          node scripts/ce-agents/restore-processes-local.mjs
+      - name: Restore 2496 field dictionary records to LOCAL PostgreSQL and verify 20 fields
+        shell: bash
+        env:
+          CE_LOCAL_ONLY: 'YES'
+        run: |
+          CE_DB_LOCAL_URL="$(supabase status -o env | sed -n 's/^DB_URL=//p' | tr -d '"')"
+          test -n "$CE_DB_LOCAL_URL"
+          export CE_DB_LOCAL_URL
+          node scripts/ce-agents/restore-field-catalog-local.mjs
+      - name: Audit recovered MOF M3 source and existing structural tables
+        run: node scripts/ce-agents/audit-mof-foundation.mjs
+      - name: Restore 362 read-only normative reference metadata rows into LOCAL catalog
+        shell: bash
+        env:
+          CE_LOCAL_ONLY: 'YES'
+        run: |
+          CE_DB_LOCAL_URL="$(supabase status -o env | sed -n 's/^DB_URL=//p' | tr -d '"')"
+          test -n "$CE_DB_LOCAL_URL"
+          export CE_DB_LOCAL_URL
+          node scripts/ce-agents/restore-normative-reference-local.mjs
+      - name: Seed six official normative references in LOCAL canonical registry
+        shell: bash
+        env:
+          CE_LOCAL_ONLY: 'YES'
+        run: |
+          CE_DB_LOCAL_URL="$(supabase status -o env | sed -n 's/^DB_URL=//p' | tr -d '"')"
+          test -n "$CE_DB_LOCAL_URL"
+          export CE_DB_LOCAL_URL
+          node scripts/ce-agents/seed-mof-reference-local.mjs
+      - name: Verify combined canonical normative metadata count LOCAL ONLY (362 source + 6 recovered)
+        shell: bash
+        env:
+          CE_LOCAL_ONLY: 'YES'
+        run: |
+          CE_DB_LOCAL_URL="$(supabase status -o env | sed -n 's/^DB_URL=//p' | tr -d '"')"
+          test -n "$CE_DB_LOCAL_URL"
+          export CE_DB_LOCAL_URL
+          node --input-type=module <<'NODE'
+          import pg from 'pg';
+          const u=new URL(process.env.CE_DB_LOCAL_URL);
+          if(process.env.CE_LOCAL_ONLY!=='YES'||!['localhost','127.0.0.1','[::1]'].includes(u.hostname)||u.pathname!=='/postgres') throw Error('LOCAL_ONLY_GUARD');
+          const db=new pg.Client({connectionString:u.href});
+          await db.connect();
+          try {
+            const r=await db.query('SELECT count(*)::int AS n FROM cko_governance.normative_reference_catalog');
+            if(r.rows[0].n!==368)throw Error('NORMATIVE_CATALOG_RECONCILIATION_NOT_368');
+            console.log(JSON.stringify({status:'LOCAL_NORMATIVE_REFERENCES_368_VALIDATED',source:362,supplement:6,total:r.rows[0].n,productionWrites:false,release:'HOLD_HUMAN'}));
+          } finally { await db.end(); }
+          NODE
+      - name: Stage generated non-secret config in candidate branch only
+        run: |
+          test "$GITHUB_REF" = 'refs/heads/canonical/supabase-skeleton-20261101'
+          git add supabase/config.toml
+          if ! git diff --cached --quiet; then
+            git config user.name 'CE Supabase Local Bootstrap'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'chore(supabase): version CLI-generated local configuration [WO-CE-DB-SKELETON-001]'
+            # Do not force-push; reconcile concurrent snapshot commits deterministically.
+            for attempt in 1 2 3; do
+              git fetch origin canonical/supabase-skeleton-20261101
+              git rebase origin/canonical/supabase-skeleton-20261101
+              if git push origin HEAD:canonical/supabase-skeleton-20261101; then
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then echo 'HOLD_HUMAN: concurrent branch update'; exit 2; fi
+            done
+          fi
+      - name: Store local TypeScript schema verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ce-supabase-local-bootstrap
+          path: |
+            supabase/config.toml
+            /tmp/ce-local-types.ts
+            artifacts/ce-agents/local-catalog-replay.json
+            artifacts/ce-agents/local-app-skeleton.json
+            artifacts/ce-agents/local-physical-ddl.json
+            artifacts/ce-agents/local-physical-ddl-parity.json
+            artifacts/ce-agents/full-ddl-parity-summary.json
+            artifacts/ce-agents/mof-foundation-parity.json
+            artifacts/ce-agents/mof-normative-local-seed.json
+            artifacts/ce-agents/local-normative-metadata-replay.json
+            artifacts/ce-agents/local-process-recovery.json
+            artifacts/ce-agents/local-field-catalog-replay.json
+          if-no-files-found: warn
+      - name: Clean up ephemeral stack
+        if: always()
+        run: supabase stop || true
