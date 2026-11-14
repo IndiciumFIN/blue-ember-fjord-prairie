@@ -20,7 +20,8 @@
       "role": "administrator-local",
       "templateKind": "area",
       "requiredImports": [
-        "@/components/local/local-workbench-page"
+        "@/components/admin/shell",
+        "@/components/site/areas"
       ],
       "assertion": "static-import-presence"
     },
@@ -38,9 +39,9 @@
       "role": "subscriber",
       "templateKind": "ferramenta",
       "requiredImports": [
-        "@/lib/local-canonical",
+        "@/components/site/areas",
         "@/components/tools/clinical-tool",
-        "@/components/site/areas"
+        "@/lib/source.functions"
       ],
       "assertion": "static-import-presence"
     },
@@ -49,9 +50,10 @@
       "role": "subscriber",
       "templateKind": "area",
       "requiredImports": [
-        "@/lib/local-canonical",
+        "@/components/article/article-page",
         "@/components/site/areas",
-        "@/components/site/page-hero"
+        "@/components/site/community",
+        "@/lib/source.functions"
       ],
       "assertion": "static-import-presence"
     },
@@ -108,9 +110,10 @@
       "role": "public",
       "templateKind": "ferramenta",
       "requiredImports": [
-        "@/lib/local-canonical",
         "@/components/tools/clinical-tool",
-        "@/components/site/shell"
+        "@/components/site/shell",
+        "@/lib/source.functions",
+        "@/lib/seo"
       ],
       "assertion": "static-import-presence"
     },
@@ -170,7 +173,8 @@
       "role": "public",
       "templateKind": "area",
       "requiredImports": [
-        "@/components/vila/vila-hub"
+        "@/components/article/article-page",
+        "@/components/site/shell"
       ],
       "assertion": "static-import-presence"
     },
@@ -179,7 +183,8 @@
       "role": "public",
       "templateKind": "area",
       "requiredImports": [
-        "@/components/vila/vila-hub"
+        "@/components/article/article-page",
+        "@/components/site/shell"
       ],
       "assertion": "static-import-presence"
     },
@@ -207,7 +212,7 @@
       "role": "public",
       "templateKind": "biblioteca",
       "requiredImports": [
-        "@/lib/templates",
+        "@/lib/template-catalog",
         "@/components/templates/editorial-view",
         "@/components/templates/form-view",
         "@/components/site/shell"
@@ -219,7 +224,7 @@
       "role": "public",
       "templateKind": "biblioteca",
       "requiredImports": [
-        "@/lib/templates",
+        "@/lib/template-catalog",
         "@/components/article/article-page",
         "@/components/site/shell"
       ],
@@ -246,7 +251,7 @@
       "role": "public",
       "templateKind": "area",
       "requiredImports": [
-        "@/lib/site-data",
+        "@/lib/stored",
         "@/components/article/article-page",
         "@/components/site/shell"
       ],
@@ -257,7 +262,7 @@
       "role": "public",
       "templateKind": "secao",
       "requiredImports": [
-        "@/lib/sections",
+        "@/lib/stored.functions",
         "@/components/site/section-page",
         "@/components/site/shell"
       ],
@@ -328,7 +333,7 @@
       "role": "public",
       "templateKind": "area",
       "requiredImports": [
-        "@/components/vila/vila-page",
+        "@/components/vila-page",
         "@tanstack/react-router"
       ],
       "assertion": "static-import-presence"
