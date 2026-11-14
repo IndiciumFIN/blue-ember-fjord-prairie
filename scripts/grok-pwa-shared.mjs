@@ -435,6 +435,16 @@ export function normalizeHeadContext(ctx = {}) {
   };
 }
 
+/** App-owned link declarations take precedence over platform PWA fallbacks. */
+function declaresHeadLinkRel(html, rel) {
+  const head = String(html).match(/<head\b[^>]*>([\s\S]*?)(?:<\/head>|$)/i)?.[1] ?? String(html);
+  return [...head.matchAll(/<link\b[^>]*>/gi)].some(([tag]) => {
+    const attr = tag.match(/\brel\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
+    const values = (attr?.[1] ?? attr?.[2] ?? attr?.[3] ?? "").toLowerCase().split(/\s+/);
+    return values.includes(rel);
+  });
+}
+
 export function injectGrokPwaHead(html, ctx = {}) {
   if (typeof html !== "string") return html;
   const { site, projectId, creator, creatorId, host, cwd } = normalizeHeadContext(ctx);
@@ -450,8 +460,9 @@ export function injectGrokPwaHead(html, ctx = {}) {
 
   const missing = grokPwaHeadTags(appName)
     .filter(([key]) => {
-      if (key === "manifest") return !next.includes('href="/__grok/manifest.webmanifest"');
-      if (key === "apple-touch-icon") return !next.includes('href="/__grok/icon-180.png"');
+      if (key === "manifest" || key === "apple-touch-icon") {
+        return !declaresHeadLinkRel(next, key);
+      }
       return !next.includes(`name="${key}"`);
     })
     .map(([, tag]) => tag);
