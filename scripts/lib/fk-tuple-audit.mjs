@@ -23,6 +23,7 @@ export function analyzeFkTuples(foreignKeys, dictionaryRelations) {
         || !parentColumns.every(x => typeof x === 'string' && x.length)) {
       throw new Error('Malformed physical FK tuple: ' + (fk.constraint_name ?? 'unknown'));
     }
+    /** @param {DictionaryRelation} r @param {number} i */
     const pair = (r, i) => (
       (r.from_entity === fk.parent_table && r.to_entity === fk.child_table
         && r.from_column === parentColumns[i] && r.to_column === childColumns[i])
