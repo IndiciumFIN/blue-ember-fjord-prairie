@@ -87,7 +87,9 @@ export function load(root=resolve('.')){
   r83:'registers/governance/r83-pmo-fork-review-packet-20261031.v1.json',
   r77:'registers/governance/pmo-r77-arbitration-20261031.v1.json',
   priorApproval:'registers/governance/approval-pmokernel-audit-20261031.v1.json',
-  baselineQueue:'registers/pmo/queue.v1.json'
+  // R84 pins the 2026-10-31 Git blob, not the later working queue (+1 WO/event).
+  // Keep the original R84 source path/pin unchanged in its signed-absence record.
+  baselineQueue:'registers/pmo/snapshots/queue-r84-r85-rev18-20261031.v1.json'
  };
  const json=p=>JSON.parse(read(p));
  return {packet:json('registers/governance/r84-pmo-owner-decision-intake-20261031.v1.json'),
