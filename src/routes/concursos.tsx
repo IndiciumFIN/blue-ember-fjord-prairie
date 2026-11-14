@@ -5,7 +5,7 @@ import { Shell } from "@/components/site/shell";
 export const Route = createFileRoute("/concursos")({
   head: () => ({ meta: [
     { title: "Concursos · Calculadoras de Enfermagem" },
-    { name: "robots", content: "index, follow" },
+    { name: "robots", content: "noindex, nofollow" },
   ] }),
   component: () => (
     <Shell>
