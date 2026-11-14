@@ -4,6 +4,14 @@
  *
  * Evidence-only: no SQL writes, no new authority or clinical admission.
  */
+/**
+ * @typedef {{ constraint_name:string, child_table:string, parent_table:string,
+ *   child_columns:string[], parent_columns:string[] }} PhysicalFK
+ * @typedef {{ name:string, from_entity:string, to_entity:string,
+ *   from_column:string, to_column:string }} DictionaryRelation
+ * @param {PhysicalFK[]} foreignKeys
+ * @param {DictionaryRelation[]} dictionaryRelations
+ */
 export function analyzeFkTuples(foreignKeys, dictionaryRelations) {
   const findings = [];
   for (const fk of foreignKeys) {
