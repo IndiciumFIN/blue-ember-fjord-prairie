@@ -13,6 +13,9 @@ export async function syncDictionary(db: Queryable) {
 }
 
 export async function dictionaryGaps(db: Queryable) {
+  // Only aligned ordinal FK column pairs count as physical evidence.
+  // Composite FKs remain unapproved as complete tuples until a versioned
+  // full-tuple relationship contract exists. Never infer from table names.
   const missing = await db.query<{ child: string }>(`
     select format('%s.%s', child_table.relname, child_attribute.attname) as child
     from pg_constraint as constraint_row
@@ -35,12 +38,6 @@ export async function dictionaryGaps(db: Queryable) {
         ) or (
           known.from_entity = child_table.relname and known.to_entity = parent_table.relname
           and known.from_column = child_attribute.attname and known.to_column = parent_attribute.attname
-        ) or (
-          cardinality(constraint_row.conkey) > 1
-          and (
-            (known.from_entity = parent_table.relname and known.to_entity = child_table.relname)
-            or (known.from_entity = child_table.relname and known.to_entity = parent_table.relname)
-          )
         )
       )
     order by 1
@@ -54,10 +51,13 @@ export async function dictionaryGaps(db: Queryable) {
       join pg_class as child_table on child_table.oid = constraint_row.conrelid
       join pg_class as parent_table on parent_table.oid = constraint_row.confrelid
       join pg_namespace as namespace on namespace.oid = child_table.relnamespace
+      join lateral unnest(constraint_row.conkey) with ordinality as child_key(attnum, ord) on true
+      join lateral unnest(constraint_row.confkey) with ordinality as parent_key(attnum, ord)
+        on parent_key.ord = child_key.ord
       join pg_attribute as child_attribute
-        on child_attribute.attrelid = child_table.oid and child_attribute.attnum = any (constraint_row.conkey)
+        on child_attribute.attrelid = child_table.oid and child_attribute.attnum = child_key.attnum
       join pg_attribute as parent_attribute
-        on parent_attribute.attrelid = parent_table.oid and parent_attribute.attnum = any (constraint_row.confkey)
+        on parent_attribute.attrelid = parent_table.oid and parent_attribute.attnum = parent_key.attnum
       where constraint_row.contype = 'f'
         and namespace.nspname = 'public'
         and (
