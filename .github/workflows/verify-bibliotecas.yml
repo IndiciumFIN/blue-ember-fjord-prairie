@@ -59,7 +59,9 @@ jobs:
           # Mesmo conjunto de arquivos que Vercel prepara para npm ci/build.
           git ls-files --cached --ignored --exclude-from=.vercelignore -z | xargs -0 -r rm -f
           echo "PASS: entradas criticas preservadas; exclusoes Vercel simuladas"
-      - run: npm ci
+      - name: Instalar dependencias para suites
+        id: deps
+        run: npm ci
       - name: Auditoria de dependências bloqueante
         run: npm audit --audit-level=high
       - run: node scripts/test-admin-console.mjs
@@ -68,6 +70,10 @@ jobs:
       - run: node scripts/check-cko-packages.mjs
       - run: node scripts/check-contract-coverage.mjs
       - run: npm test
+      # Executa tambem quando a suite geral reprovar; nao mascara falhas anteriores.
+      - name: Testar dicionario e camadas sem admitir plataforma
+        if: ${{ !cancelled() && steps.deps.outcome == 'success' }}
+        run: npm run test:platform
       - run: node scripts/audit-execution-gates.mjs
       - run: npm run build:spa
       - name: Verificar arquivos estaticos basicos
