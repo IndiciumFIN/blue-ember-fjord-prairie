@@ -1,0 +1,55 @@
+name: NCOS source universe reconciliation (non-accounting, no deploy)
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-universe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      DATABASE_URL: ""
+      PGHOST: ""
+    steps:
+      - name: Checkout without persisted credentials
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+      - name: Test source-first universe fail-closed behavior
+        run: node --test scripts/ncos-multisource-audit.test.mjs
+      - name: Regenerate cross-source lineage from pinned metadata and GitHub artifacts
+        run: node scripts/ncos-multisource-audit.mjs --inventory
+      - name: Negative tests for originals, claims, editorial bindings and identity matches
+        run: node --test scripts/ncos-recovery-deltas.test.mjs
+      - name: Verify independent original-PDF SHA256 helper with synthetic bytes
+        run: node --test scripts/ncos-pdf-byte-integrity.test.mjs
+      - name: Derive exact atom-recovery, source identity and claim/editorial deltas
+        run: node scripts/ncos-recovery-deltas.mjs
+      - name: Test authoritative legal amendments and derived non-official snapshots
+        run: node --test scripts/ncos-provision-lineage.test.mjs
+      - name: Rebuild normative source-fragment-provision-master graph from evidence metadata
+        run: node scripts/ncos-provision-lineage.mjs --inventory
+      - name: Exercise source rights and controlled master projection failure modes
+        run: node --test scripts/ncos-rights-master-gate.test.mjs
+      - name: Rebuild source rights and unresolved CKO master projection report
+        run: node scripts/ncos-rights-master-gate.mjs --inventory
+      - name: Test separate data-corpus and literal PDF evidence boundaries
+        run: node --test scripts/ncos-dual-corpus.test.mjs
+      - name: Reconcile reported topic atoms without claiming source PDF atomization
+        run: node scripts/ncos-dual-corpus.mjs --inventory
+      - name: Enforce release gate without making credentials available
+        run: node scripts/ncos-multisource-audit.mjs --enforce-release
+      - name: Preserve inventory and HOLD evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ncos-nonaccounting-source-universe
+          path: audit-evidence/ncos-multisource-universe/
+          if-no-files-found: warn
+          retention-days: 30
