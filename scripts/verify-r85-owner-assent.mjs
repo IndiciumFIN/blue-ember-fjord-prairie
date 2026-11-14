@@ -81,7 +81,13 @@ export function validate({assent,intake,arbitration,priorApproval,currentQueue,p
  return {conversationRecommendationsRecorded:4,authenticatedDecisions:0,checkerApprovals:0,kernelAdmissions:0,canonicalElection:false,releaseGate:'HOLD_HUMAN'};
 }
 export function load(root=resolve('.')){
- const pinnedBytes=Object.fromEntries(Object.entries(PINNED).map(([k,path])=>[k,readFileSync(join(root,path))]));
+ // sourcePins.path identifies the file at the historic decision time, not a
+ // commitment to re-evaluate against every later edit of that path.
+ // The original pinned bytes are kept under a Git-blob-identical snapshot.
+ const historicQueue='registers/pmo/snapshots/queue-r84-r85-rev18-20261031.v1.json';
+ const pinnedBytes=Object.fromEntries(Object.entries(PINNED).map(([k,path])=>[
+   k,readFileSync(join(root,k==='currentQueue'?historicQueue:path))
+ ]));
  const parsed=k=>JSON.parse(String(pinnedBytes[k]));
  return {
    pinnedBytes,
