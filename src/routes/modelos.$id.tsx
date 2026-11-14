@@ -15,6 +15,7 @@ import { unflatten, useStored } from "@/lib/stored";
 import { lorem, loremData } from "@/lib/lorem";
 import { ContractView } from "@/components/templates/contract-view";
 import { CanonicalContentFamilyView } from "@/components/templates/canonical-content-family-view";
+import { ClinicalToolBacklogView } from "@/components/templates/clinical-tool-backlog-view";
 import { canonicalFamilyById } from "@/lib/canonical-content-families";
 import { recoveredTemplate } from "@/components/templates/recovered-templates";
 import { catalogById } from "@/lib/template-catalog";
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/modelos/$id")({
   },
   loader: async ({ params }) => {
     if (params.id === "folha") throw redirect({ to: "/ferramentas/$slug", params: { slug: "gotejamento" } });
+    if (params.id === "inventario-ferramentas") return { kind: "inventario" as const };
     if (params.id === "guia") return { kind: "guia" as const };
     if (params.id === "biblioteca") return { kind: "biblioteca" as const };
     if (params.id === "norma") return { kind: "norma" as const };
@@ -55,6 +57,7 @@ export const Route = createFileRoute("/modelos/$id")({
 function Modelo() {
   const data = Route.useLoaderData();
   const templates = useStored().templates;
+  if (data.kind === "inventario") return <Shell><ClinicalToolBacklogView /></Shell>;
   if (data.kind === "guia") return <Shell><GuideView /></Shell>;
   if (data.kind === "biblioteca") return <Shell><LibraryView /></Shell>;
   if (data.kind === "norma") return <Shell><NormView /></Shell>;
