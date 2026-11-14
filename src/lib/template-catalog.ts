@@ -1,4 +1,5 @@
 import type { TemplateKind } from "@/lib/template-contract";
+import { canonicalContentFamilies } from "@/lib/canonical-content-families";
 
 export type CatalogRow = {
   id: string;
@@ -47,6 +48,11 @@ export const templateCatalog: CatalogRow[] = [
   { id: "area-assinante", name: "Área do assinante", href: "/assinante", kind: "area", frame: "area", note: "none", situacao: "montagem", source: "área logada" },
   { id: "area-admin", name: "Área do administrador", href: "/admin", kind: "area", frame: "admin", note: "none", situacao: "montagem", source: "console" },
   { id: "viladocuidado", name: "Vila do Cuidado", href: "/viladocuidado", kind: "editorial", frame: "shell", note: "inline", situacao: "montagem", source: "piloto educativo migrado do backup" },
+  ...canonicalContentFamilies.map((family) => ({
+    id: family.id, name: family.name, href: `/modelos/${family.id}`,
+    kind: family.kind, frame: "shell" as const, note: "callout" as const,
+    situacao: "molde" as const, source: "registro canônico de famílias de conteúdo v1",
+  })),
 ];
 
 export function catalogById(id: string) {
